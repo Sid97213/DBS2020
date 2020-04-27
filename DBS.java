@@ -76,29 +76,73 @@ class Relations{
        	}
 		
        	for(Character c: essential_attr){                           //changing value of essential attr of key to 1 in map
-       		map.put(c,1); 			
+       		map.put(c,1); 		
        	}
 
        	Map<Character,Integer> map_new = closure(map,fd_set);		//calling the closure function on the essential attr
 
-       	int complete=1;												//checking whether the closure of essential attr is the entire set of attributes or not
-       	for(Integer key: map_new.values()){
-       		if(key==0)
-       			complete=0;
-       	}
-       	String key="";
-       	if (complete==1){
-       		for(Character c: essential_attr){
-       			key=key+c;
-       		}
-       		return key;
-       	}
-       	else{
-       		System.out.println("Code to be written!");
-       		return key;
-       	}
+        boolean ans=false;                          
+        ans = complete(map_new);                                    //check whether the closure is the complete set
 
+        String key="";
+        if(ans==true){                                              //if closure of essential attr is complete, then return it as the key
+            for(Character c: essential_attr){
+                key=key+c;
+            }
+            return key;
+        }
+        else{                                                       //finding attr that are on both left and right sides of the FD set
+            List<Character> left = new ArrayList<>();
+            List<Character> right = new ArrayList<>();
+            List<Character> common = new ArrayList<>();
+            for(String s: fd_set){
+                char[] sch = s.toCharArray();
+                for(int i=0; sch[i]!='-'; i++){
+                    left.add(sch[i]);
+                }
+                for(int j=s.length()-1; sch[j]!='>'; j--){
+                    right.add(sch[j]);
+                }
+            }
+            for(Character a: left){
+                for(Character b: right){
+                    if(a==b){
+                        common.add(a);
+                    }
+                }
+            }
+            List<Character> curr = new ArrayList<>();               //if any common attr is already present in the prev closure, then we dont consider it for the key
+            for(Character a: common){
+                if(map_new.get(a)==1){
+                    curr.add(a);
+                } 
+            }
+            for(Character a: curr){
+                common.remove(a);
+            }
+            for(Character a: common){                               //try adding each common element and checking whether the closure is complete or not
+                essential_attr.add(a);
+                for(int i=1; i<relation.length(); i=i+2){                   
+                     map_new.put(temp[i],0);   
+                }
+                for(Character b: essential_attr){
+                    map_new.put(b,1);
+                }
+                Map<Character,Integer> map1 = closure(map_new,fd_set);
+                ans = complete(map1);
+                if (ans){
+                    for(Character c: essential_attr){
+                        key=key+c;
+                    }
+                    return key;
+                }
+                essential_attr.remove(a);
+            }
+            System.out.println("Test case not working yet");
+            return key;
+        }
     }
+
     public static Map<Character,Integer> closure(Map<Character,Integer> map,List<String> fd_set)    //function to find closure of attr
     {
        	int flag=1;
@@ -110,17 +154,28 @@ class Relations{
        					for(int i=0; sch[i]!='-'; i++){
        						if(map.get(sch[i])==0){
        							flag=0;
-       						}
-       						if(flag==1){
-       							map.put(sch[sch.length-1],1);
-       						}
+       						}	
        					}
+                        if(flag==1){
+                            map.put(sch[sch.length-1],1);
+                        }
        				}
        			}
        		}
        	}
        	return map;
     }  
+
+    public static boolean complete(Map<Character,Integer> map_new){
+        boolean complete=true;                                             //checking whether the closure of essential attr is the entire set of attributes or not
+        for(Integer key: map_new.values()){
+            if(key==0){
+                complete=false;
+                break;
+            }
+        }
+        return complete;
+    }
 }
 
 class DBS{
