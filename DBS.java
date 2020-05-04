@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.*;
+import java.util.Map;
 
 class Relations{
 	String relation; String fd;
@@ -8,7 +9,7 @@ class Relations{
 		this.fd=fd;
 	}
 
-	public static String find_key(String relation,String fd)
+	public static List<String> candidate_key(String relation,String fd)
 	{
 		List<String> fd_set = new ArrayList<>();
 		List<String> fd_set1 = new ArrayList<>();
@@ -63,102 +64,123 @@ class Relations{
        	}		
         
        	List<Character> essential_attr = new ArrayList<>();        //adding the essential attr of key to list
+        List<Character> non_essential_attr = new ArrayList<>(); 
         for (Map.Entry<Character, Integer> entry : map.entrySet()){
         	if(entry.getValue()==0){
         		essential_attr.add(entry.getKey());			
         	}
+            else{
+                non_essential_attr.add(entry.getKey());
+            }
        	}
 
        	for(int i=1; i<relation.length(); i=i+2){                   //initializing all relation attr to 0
        		map.put(relation.charAt(i),0);   
        	}
-		
-       	for(Character c: essential_attr){                           //changing value of essential attr of key to 1 in map
-       		map.put(c,1); 		
-       	}
 
-       	Map<Character,Integer> map_new = closure(map,fd_set);		//calling the closure function on the essential attr
-
-        boolean ans=false;                          
-        ans = complete(map_new);                                    //check whether the closure is the complete set
-
-        String key="";
-        if(ans==true){                                              //if closure of essential attr is complete, then return it as the key
-            for(Character c: essential_attr){
-                key=key+c;
-            }
-            return key;
-        }
-        else{                                                       //finding attr that are on both left and right sides of the FD set
-            List<Character> left = new ArrayList<>();
-            List<Character> right = new ArrayList<>();
-            List<Character> common = new ArrayList<>();
-            for(String s: fd_set){
-                for(int i=0; s.charAt(i)!='-'; i++){
-                    left.add(s.charAt(i));
-                }
-                for(int j=s.length()-1; s.charAt(j)!='>'; j--){
-                    right.add(s.charAt(j));
-                }
-            }
-            for(Character a: left){
-                for(Character b: right){
-                    if(a==b){
-                        common.add(a);
-                    }
-                }
-            }
-            List<Character> curr = new ArrayList<>();               //if any common attr is already present in the prev closure, then we dont consider it for the key
-            for(Character a: common){
-                if(map_new.get(a)==1){
-                    curr.add(a);
+        List<String> store = new ArrayList<>();
+        HashSet<Character> list = new HashSet<Character>();
+        HashMap<String,Integer> cand_key = new HashMap<>();
+        for(Character c: essential_attr) { list.add(c);}
+        int n = non_essential_attr.size();
+        for(int i=0; i<=(1<<n); i++){
+            for(int j=0; j<n; j++){
+                if ((i & (1 << j)) != 0){
+                    list.add(non_essential_attr.get(j));
                 } 
             }
-            for(Character a: curr){
-                common.remove(a);
+            for(Character c: list){ map.put(c,1);} 
+            Map<Character,Integer> map_new = closure(map,fd_set);
+            boolean ans=false;                          
+            ans = complete(map_new);
+            if(ans==true){ 
+                String s = "";
+                for(Character c: list) { s=s+c;} cand_key.put(s,0);
             }
-            for(Character a: common){                               //try adding each common element and checking whether the closure is complete or not
-                essential_attr.add(a);
-                for(int i=1; i<relation.length(); i=i+2){                   
-                     map_new.put(relation.charAt(i),0);   
-                }
-                for(Character b: essential_attr){
-                    map_new.put(b,1);
-                }
-                Map<Character,Integer> map1 = closure(map_new,fd_set);
-                ans = complete(map1);
-                if (ans){
-                    for(Character c: essential_attr){
-                        key=key+c;
-                    }
-                    return key;
-                }
-                essential_attr.remove(a);
+            if((i==0)&&(ans==true)){
+                String s = "";
+                for(Character c: list) { s=s+c;} store.add(s);
+                break;
             }
-            System.out.println("Test case not working yet");
-            return key;
+            else{
+                list.retainAll(essential_attr);
+                for(int k=1; k<relation.length(); k=k+2){                   //initializing all relation attr to 0
+                    map.replace(relation.charAt(k),0);   
+                }
+            }
         }
-    }
+        int max_len=0;
+        int min_len=100;
+        for (Map.Entry<String, Integer> entry : cand_key.entrySet()){
+            String s = entry.getKey();
+            if(s.length()<min_len){
+                min_len=s.length();
+            }
+            if(s.length()>max_len){
+                max_len=s.length();
+            }
+        }
+        
 
+        for (Map.Entry<String, Integer> entry : cand_key.entrySet()){
+            while(entry.getValue()!=2){
+                for (Map.Entry<String, Integer> entry1 : cand_key.entrySet()){
+                    String s = entry1.getKey();
+                    if((entry1.getValue()==0)&&(s.length()==min_len)){
+                        cand_key.replace(s,2);
+                        store.add(s);
+                    }
+                }
+                min_len++;
+                for (Map.Entry<String, Integer> entry1 : cand_key.entrySet()){
+                    String s = entry1.getKey();
+                    if(entry1.getValue()==0){
+                        for(String s1: store){
+                            if(stringToCharacterSet(s).containsAll(stringToCharacterSet(s1))){
+                                cand_key.replace(s,2);
+                            }
+                        }
+                    }
+            
+                }
+            }
+        }
+
+        return store;
+    }
+    public static Set<Character> stringToCharacterSet(String s){
+        Set<Character> set = new HashSet<>();
+        for (char c : s.toCharArray()) {
+            set.add(c);
+        }
+       return set;
+    }
     public static Map<Character,Integer> closure(Map<Character,Integer> map,List<String> fd_set)    //function to find closure of attr
     {
-       	int flag=1;
-       	for(Character key: map.keySet()){						
+        for(int j=0; j<3; j++){
+       	for(Character key: map.keySet()){
+        int flag=1;						
        		if(map.get(key)==1){
        			for(String s:fd_set){
        				if(key==s.charAt(0)){
-       					for(int i=0; s.charAt(i)!='-'; i++){
-       						if(map.get(s.charAt(i))==0){
-       							flag=0;
-       						}	
-       					}
-                        if(flag==1){
+                        if(s.charAt(1)=='-'){
                             map.put(s.charAt(s.length()-1),1);
+                        }
+                        else{
+       					    for(int i=0; s.charAt(i)!='-'; i++){
+       						   if(map.get(s.charAt(i))==0){
+       							  flag=0;
+       						   }	
+       					    }
+                            if(flag==1){
+                             map.put(s.charAt(s.length()-1),1);
+                            }
                         }
        				}
        			}
        		}
        	}
+       }
        	return map;
     }  
 
@@ -187,8 +209,25 @@ class Relations{
         }
 
         List<String> violates_bcnf = new ArrayList<>();
-        String key = r.find_key(r.relation,r.fd);
-        for(int i=0;i<key.length();i++){
+        List<String> super_keys = r.candidate_key(r.relation,r.fd);
+        //String key = r.candidate_key(r.relation,r.fd);
+        int flag=0;
+        for(String s:fd_set){
+            String s1="";
+            for(int i=0; s.charAt(i)!='-'; i++){
+                s1=s1+s.charAt(i);
+            }
+            for(String s2: super_keys){
+                if(s1.equals(s2)){
+                    flag=1;
+                }
+            }
+            if(flag==0){
+                violates_bcnf.add(s);
+            }
+            flag=0;
+        }
+        /*for(int i=0;i<key.length();i++){
             for(String s: fd_set){
                 for(int j=s.length()-1; s.charAt(j)!='>'; j--){
                     if(s.charAt(j)==key.charAt(i)){
@@ -197,7 +236,7 @@ class Relations{
                 }
             }
             
-        }
+        }*/
 
         for(String s: violates_bcnf){
             Set<Character> alpha = new HashSet<Character>();
@@ -227,7 +266,8 @@ class Relations{
             System.out.print("Relation 2: "); 
             System.out.print(difference1);    System.out.print("\t");
             Set<Character> key_of_r2 = new HashSet<Character>(); 
-            for(Character a: difference1){
+
+            /*for(Character a: difference1){
                 for(int i=0; i<key.length(); i++){
                     for(Character c: alpha){
                         if(a==key.charAt(i)||(a==c)){
@@ -235,7 +275,7 @@ class Relations{
                         }
                     }
                 }
-            }
+            }*/
             System.out.print("The key of this relation is: ");
             for(Character b: key_of_r2){
                 System.out.print(b);
@@ -253,9 +293,11 @@ class DBS{
 		String fd = sc.nextLine();
 
 		Relations r1 = new Relations(relation,fd);
-		String key=r1.find_key(relation,fd);
-		System.out.println("The key of the relation is: " + key);
+		List<String> arr =r1.candidate_key(relation,fd);
+        System.out.println("The candidate keys of the relation are: ");
+        for(String s: arr) {System.out.println(s);}
+		//System.out.println("The key of the relation is: " + key);
 
-        r1.nf3_to_bcnf(r1);
+        //r1.nf3_to_bcnf(r1);
 	}
 }
