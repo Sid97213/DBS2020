@@ -207,12 +207,113 @@ class Relations{
             Character c = (st2.nextToken()).charAt(0);
             r_set.add(c);
         }
+        List<String> super_keys = r.candidate_key(r.relation,r.fd); 
+        boolean is_bcnf = check_bcnf(super_keys,fd_set);
 
-        List<String> violates_bcnf = new ArrayList<>();
-        List<String> super_keys = r.candidate_key(r.relation,r.fd);
-        //String key = r.candidate_key(r.relation,r.fd);
+        if(!is_bcnf){
+            List<String> violates_bcnf = new ArrayList<>();
+            int flag=0;
+            for(String s:fd_set){
+                String s1="";
+                for(int i=0; s.charAt(i)!='-'; i++){
+                    s1=s1+s.charAt(i);
+                }
+                for(String s2: super_keys){
+                    if(s1.equals(s2)){
+                        flag=1;
+                    }
+                }
+                if(flag==0){
+                    violates_bcnf.add(s);
+                }
+                flag=0;
+            }
+            while(!is_bcnf){
+                String s= violates_bcnf.get(0);
+                Set<Character> alpha = new HashSet<Character>();
+                Set<Character> beta = new HashSet<Character>();
+                for(int i=0; s.charAt(i)!='-'; i++){
+                    alpha.add(s.charAt(i));
+                }                                       //System.out.println(alpha);
+                for(int j=s.length()-1; s.charAt(j)!='>'; j--){
+                    beta.add(s.charAt(j));
+                }                                       //System.out.println(beta); 
+                //System.out.println("The decomposed bcnf relations are: ");
+                Set<Character> union = new HashSet<Character>(alpha); 
+                union.addAll(beta);
+                System.out.print("Relation : ");
+                System.out.print(union);  System.out.print("\t");
+                System.out.print("The key of this relation is: ");
+                for(Character a: alpha){
+                    System.out.print(a);
+                }System.out.println();
+                
+                Set<Character> difference = new HashSet<Character>(beta); 
+                difference.removeAll(alpha); 
+                Set<Character> difference1 = new HashSet<Character>(r_set); 
+                difference1.removeAll(difference); 
+                Relations r1 = new Relations("",""); 
+                r1 = convert_to_Relation(difference1,fd_set); 
+                List<String> super_key_r = r1.candidate_key(r1.relation,r1.fd); 
+                List<String> fd_set1 = new ArrayList<>();
+                StringTokenizer st3 = new StringTokenizer(r1.fd, ",{}"); 
+                while (st3.hasMoreTokens()) {
+                    fd_set1.add(st3.nextToken());
+                }
+                if(check_bcnf(super_key_r,fd_set1)){
+                    System.out.print("Relation : ");
+                    System.out.print(difference1);    System.out.print("\t");
+                    String s1=""; 
+                    for(Character a: difference1){
+                        s1=s1+a;
+                    } 
+                    String key_of_r2="";
+                    for(String s2: super_keys){
+                        if(stringToCharacterSet(s1).containsAll(stringToCharacterSet(s2))){
+                            key_of_r2 = s2;
+                        }
+                    }
+                    System.out.print("The key of this relation is: ");
+                    System.out.println(key_of_r2);
+                }
+                else{
+                    nf3_to_bcnf(r1); 
+                }
+                is_bcnf=true;
+            }
+        }
+    }
+
+    public static Relations convert_to_Relation(Set<Character> difference1,List<String> fd_set){
+        Relations r1;
+        String s="{";
+        for(Character a: difference1){
+            s=s+a+',';
+        }
+        List<String> rem = new ArrayList<>();
+        for(String s1: fd_set){
+            for(int i=0; i<s1.length(); i++){
+                String temp = Character.toString(s1.charAt(i)); 
+                if(!s.contains(temp)){
+                    if(!(s1.charAt(i)=='-')&&(!(s1.charAt(i)=='>'))){
+                        rem.add(s1);
+                    }
+                }
+            }
+        }
+        for(String s2: rem){
+            fd_set.remove(s2);
+        }
+        String fd ="";
+        for(String s2: fd_set){ fd=fd+s2+',';}
+        r1 = new Relations(s,fd);
+        return r1;
+    }
+
+    public static boolean check_bcnf(List<String> super_keys,List<String> fd_set){
         int flag=0;
         for(String s:fd_set){
+            flag=0;
             String s1="";
             for(int i=0; s.charAt(i)!='-'; i++){
                 s1=s1+s.charAt(i);
@@ -220,68 +321,14 @@ class Relations{
             for(String s2: super_keys){
                 if(s1.equals(s2)){
                     flag=1;
+                    break;
                 }
             }
-            if(flag==0){
-                violates_bcnf.add(s);
-            }
-            flag=0;
         }
-        /*for(int i=0;i<key.length();i++){
-            for(String s: fd_set){
-                for(int j=s.length()-1; s.charAt(j)!='>'; j--){
-                    if(s.charAt(j)==key.charAt(i)){
-                        violates_bcnf.add(s);
-                    }
-                }
-            }
-            
-        }*/
-
-        for(String s: violates_bcnf){
-            Set<Character> alpha = new HashSet<Character>();
-            Set<Character> beta = new HashSet<Character>();
-            for(int i=0; s.charAt(i)!='-'; i++){
-                alpha.add(s.charAt(i));
-            }                                       //System.out.println(alpha);
-            
-            for(int j=s.length()-1; s.charAt(j)!='>'; j--){
-                beta.add(s.charAt(j));
-            }                                       //System.out.println(beta); 
-
-            System.out.println("The decomposed relations are: ");
-            Set<Character> union = new HashSet<Character>(alpha); 
-            union.addAll(beta);
-            System.out.print("Relation 1: ");
-            System.out.print(union);  System.out.print("\t");
-            System.out.print("The key of this relation is: ");
-            for(Character a: alpha){
-                System.out.print(a);
-            }System.out.println();
-
-            Set<Character> difference = new HashSet<Character>(beta); 
-            difference.removeAll(alpha); 
-            Set<Character> difference1 = new HashSet<Character>(r_set); 
-            difference1.removeAll(difference); 
-            System.out.print("Relation 2: "); 
-            System.out.print(difference1);    System.out.print("\t");
-            Set<Character> key_of_r2 = new HashSet<Character>(); 
-
-            /*for(Character a: difference1){
-                for(int i=0; i<key.length(); i++){
-                    for(Character c: alpha){
-                        if(a==key.charAt(i)||(a==c)){
-                            key_of_r2.add(a);
-                        }
-                    }
-                }
-            }*/
-            System.out.print("The key of this relation is: ");
-            for(Character b: key_of_r2){
-                System.out.print(b);
-            } System.out.println();
-        }
+        if((flag==1)||(fd_set.isEmpty())) return true;
+        else return false;
     }
+    
 }
 
 class DBS{
@@ -296,8 +343,9 @@ class DBS{
 		List<String> arr =r1.candidate_key(relation,fd);
         System.out.println("The candidate keys of the relation are: ");
         for(String s: arr) {System.out.println(s);}
-		//System.out.println("The key of the relation is: " + key);
-
+		
+        //System.out.println("The decomposed bcnf relations are: ");
         //r1.nf3_to_bcnf(r1);
+        
 	}
 }
