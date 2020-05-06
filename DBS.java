@@ -184,6 +184,149 @@ class Relations{
        	return map;
     }  
 
+    public static boolean equivalence(List <String>fd_set1, List <String> fd_set2, Relations r){
+        boolean res=false;
+        int flag=1;
+        for(int i=1; i<r.relation.length(); i=i+2){
+            HashMap<Character, Integer> map = new HashMap<>();      
+       	    for(int j=1; j<r.relation.length(); j=j+2){
+                if(j==i){   
+                    map.put(r.relation.charAt(j),1);
+                }
+                else{
+                    map.put(r.relation.charAt(j), 0);
+                }
+            }
+            if(!closure(map, fd_set1).equals(closure(map, fd_set2))){
+                flag=flag*0;
+            }   
+            else{
+                flag=flag*1;
+            }
+        }
+        if(flag==1){
+            res=true;
+        }
+        return res;
+    }
+
+    public static List<String> minimal_cover(Relations r){
+        List<String> fd_ret= new ArrayList<>();
+        List<String> fd_set = new ArrayList<>();
+       
+        
+        StringTokenizer st1 = new StringTokenizer(r.fd, ",{}"); 
+        while (st1.hasMoreTokens()) {
+            fd_set.add(st1.nextToken());
+        }
+        fd_ret.addAll(fd_set); //1
+        Set<Character> r_set = new HashSet<Character>();
+        StringTokenizer st2 = new StringTokenizer(r.relation, ",{}"); 
+        while (st2.hasMoreTokens()) {
+            Character c = (st2.nextToken()).charAt(0);
+            r_set.add(c);
+        }
+
+        for(String s:fd_set){
+            List<String> fd_set1 = new ArrayList<>();
+            for(String s1:fd_set){
+                if(!s.equals(s1)){
+                    if(!fd_set1.contains(s1)){
+                        fd_set1.add(s1);
+                    }
+                }
+            }
+            for (int i=0; (s.charAt(i)!='-'); i++){
+                String d="";
+                if((s.indexOf("-")==1)){
+                    for(int j=0; j<(s.length()); j++){
+                        d=d+s.charAt(j);
+                        
+                    }
+                }
+                else{                
+                    for(int j=0; j<(s.length()); j++){
+                        // if(s.indexOf("-")==1){
+                        //     d=d+s.charAt(0);
+                        // }
+                        if(s.charAt(i)!=s.charAt(j)){
+                            d=d+s.charAt(j);
+                        }
+                    }
+                }
+                if(!fd_set1.contains(d)){
+                    fd_set1.add(d);      
+                }          
+                if(equivalence(fd_ret, fd_set1, r)){ //if(equivalence(fd_ret, fd_set1, r)){
+                   for(String s2: fd_set1){
+                        List<String> fd_set2 = new ArrayList<>();
+                        for (String s3: fd_set1){
+                            if(!s2.equals(s3)){
+                                if(!fd_set2.contains(s3)){
+                                    fd_set2.add(s3);
+                                }
+                            }
+                        }
+                        if(equivalence(fd_set1, fd_set2, r)){
+                            fd_ret.removeAll(fd_ret);
+                            fd_ret.addAll(fd_set2);
+                        }
+                        else{
+                            fd_ret.removeAll(fd_ret);
+                            fd_ret.addAll(fd_set1);
+                        }
+                    }
+                }
+
+                else{
+                    for(String s2: fd_set){
+                        List<String> fd_set2 = new ArrayList<>();
+                        for (String s3: fd_set){
+                            if(!s2.equals(s3)){
+                                if(!fd_set2.contains(s3)){
+                                    fd_set2.add(s3);
+                                }
+                            }
+                        }
+                        if(equivalence(fd_set, fd_set2, r)){
+                            // fd_ret= fd_set2;
+                            fd_ret.removeAll(fd_ret);
+                            fd_ret.addAll(fd_set2);
+                        }
+                        else{
+                            // fd_ret=fd_set;
+                            fd_ret.removeAll(fd_ret);
+                            fd_ret.addAll(fd_set);
+                        }
+                    }
+                }
+            }
+
+        }
+        //REMOVE THE FOLLOWING PART OF THIS FUNCTION IF CLOSURE WORKS PROPERLY
+        List<String> to_check= new ArrayList<>();
+        to_check.addAll(fd_ret);
+        for(String red: to_check){
+            List<String> fd_red= new ArrayList<>();
+            for(String red1:to_check){
+                if(!red1.equals(red)){
+                    fd_red.add(red1);
+                }
+            }
+            if(equivalence(fd_red, fd_ret, r)){
+                fd_ret.removeAll(fd_ret);
+                fd_ret.addAll(fd_red);
+            }
+            fd_red.removeAll(fd_red);
+        }
+        // int rk=1;
+        // for(String debug: fd_ret){
+        //     System.out.println(debug+" "+rk);
+        //     rk++;
+        // }
+        return fd_ret;
+    }
+
     public static boolean complete(Map<Character,Integer> map_new){
         boolean complete=true;                                             //checking whether the closure of essential attr is the entire set of attributes or not
         for(Integer key: map_new.values()){
@@ -193,6 +336,75 @@ class Relations{
             }
         }
         return complete;
+    }
+
+    public static void nf3_normalisation(Relations r, String key){ //normalises the given relation to 3nf regardless of the nf it is in
+        List<String> fd_set = new ArrayList<>();                   //remove the key argument if it is made a global variable
+        List <String> rels= new ArrayList<>(); //to store the new relations
+        StringTokenizer st1 = new StringTokenizer(r.fd, ",{}"); 
+        while (st1.hasMoreTokens()) {
+            fd_set.add(st1.nextToken());
+        }
+        Set<Character> r_set = new HashSet<Character>();
+        StringTokenizer st2 = new StringTokenizer(r.relation, ",{}"); 
+        while (st2.hasMoreTokens()) {
+            Character c = (st2.nextToken()).charAt(0);
+            r_set.add(c);
+        }
+        List<String> fd_new= new ArrayList<>();
+        fd_new.addAll(minimal_cover(r));
+        String s1="";
+        for (String str: fd_new){
+            String schema1="";
+            s1="";
+            // System.out.println("Schema and s1 updated");
+            // System.out.println("Now considering the relations:" + str);
+            for (int i=0; i<str.indexOf("-") ;i++){
+                s1=s1+str.charAt(i);
+                schema1=schema1+s1;
+                // System.out.println("Schema now:"+ schema1);
+            }
+            // System.out.println("S1:"+ s1);
+            int flag_var=0;
+            for(String str1: fd_new){
+                if (str1.lastIndexOf(s1)!=-1 && str1.lastIndexOf(s1)<str1.indexOf("-")){
+                    // System.out.println("matched in "+ str1);
+                    flag_var=1;
+                    for(int k=str1.lastIndexOf(s1)+3; k<str1.length(); k++){
+                        if(schema1.lastIndexOf(str1.charAt(k))==-1){
+                            schema1=schema1+str1.charAt(k);
+                        }
+                    }
+                    // System.out.println("Schema now:"+schema1);
+                }
+            }
+            // System.out.println("Schema to add:"+schema1);
+            if(flag_var==1){
+                if(!rels.contains(schema1)){
+                    rels.add(schema1);
+                    // System.out.println(schema1+" added");
+                }
+            }
+        }
+    
+        int contains_key=0;
+        for(String l: rels){
+            if(l.contains(key)){
+                contains_key=1;
+            }
+        }
+
+        if(contains_key==0){
+            rels.add(key);
+        }
+
+        for(String l: rels){
+            System.out.print("[ ");
+            for(int i=0; i<l.length(); i++){
+                System.out.print(l.charAt(i));
+            }
+            System.out.println(" ]");
+        }
     }
 
     public static void nf3_to_bcnf(Relations r){
@@ -346,6 +558,14 @@ class DBS{
 		
         //System.out.println("The decomposed bcnf relations are: ");
         //r1.nf3_to_bcnf(r1);
-        
+        r1.nf3_normalisation(r1, arr.get(0));
 	}
 }
+
+/*Test Cases for nf3_normalisation:
+1. R: {A,B,C,D,E,F,G}
+   FD: {A->CDE,B->FG,AB->CDEFG} 
+
+2. R: {P,L,C,A}
+   FD: {P->LCA,LC->AP,A->C}
+*/
