@@ -157,6 +157,37 @@ class Relations{
     }
     public static Map<Character,Integer> closure(Map<Character,Integer> map,List<String> fd_set)    //function to find closure of attr
     {
+        List<String> fd_set1 = new ArrayList<>();
+        List<Integer> storeIndex = new ArrayList<>();              //ensuring all right side attributes are single attributes   
+        for (String s : fd_set) {                                           
+            for(int i=0; i<s.length(); i++){
+                char[] sch = s.toCharArray();
+                if (s.charAt(i)=='>'){
+                    if(i+2 != s.length()){
+                        for(int j=1; j<=(s.length()-i-1); j++){
+                            String decomp = "";
+                            decomp = decomp.copyValueOf(sch,0,i+1);
+                            decomp = decomp + s.charAt(i+j);
+                            fd_set1.add(decomp);
+                        }
+                        storeIndex.add(fd_set.indexOf(s));
+                    }
+                }
+            }
+        }
+        for (String s: fd_set1){                                  //add decomposed relations to fd_set
+            fd_set.add(s);
+        }
+        for(int i: storeIndex){                                   //remove the original relation that was decomposed
+            fd_set.remove(i);
+        }
+
+        for(String s: fd_set){                                    //removing redundant fd 
+            char[] sch = s.toCharArray();
+            if((sch[0]==s.charAt(s.length()-1))&&(s.charAt(1)=='-')){
+                fd_set.remove(s);
+            }
+        }
         for(int j=0; j<3; j++){
        	for(Character key: map.keySet()){
         int flag=1;						
