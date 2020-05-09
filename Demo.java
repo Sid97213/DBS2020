@@ -75,7 +75,7 @@ class Demo{
 		}
 		System.out.println();
     }
-	public static void Insert(List<Integer> keys) throws MemoryExceededException{
+	public static List<String> Calculate(List<Integer> keys,String oper) throws MemoryExceededException{
 		List<String> hash_val = hash_fn(keys);
 		int[] counti = new int[2]; 
 		counti[0]=0; counti[1]=0;
@@ -227,7 +227,10 @@ class Demo{
 			}
 		}
 
-		print_result(ans,array,GD);
+		if(oper.equals("insert")||oper.equals("delete")){
+			print_result(ans,array,GD);
+		}
+		return ans;
 	}
 	public static void print_result(List<String> ans,int[][] array,int GD){
 		System.out.println("GD: "+GD);
@@ -247,7 +250,24 @@ class Demo{
 		}
 	}
 	public static void search(List<Integer> keys,int x){
+		int mod = x%10; 
+		String s = Integer.toBinaryString(mod);
+		while(s.length()!=4){
+        	s='0'+s;
+        }
+		List<String> buckets = new ArrayList<>();
+		try{
+			buckets = Calculate(keys,"search");
+		}
+		catch(MemoryExceededException mee) { return;}
 
+		for(String s1: buckets){
+			if(s1.equals(get_last_digits(s,s1.length()))){
+				System.out.println("Key "+x+" is present in bucket "+s1);
+			}
+			
+		}
+		
 	}
 	public static void main(String args[]){
 		System.out.print("Enter the number of operations: ");
@@ -270,11 +290,10 @@ class Demo{
                 }
                 else{
                     store.add(key);
-                    try{  Insert(store); }
+                    try{  Calculate(store,"insert"); }
                     catch(MemoryExceededException mee){
                     	return;
                     }
-                    
                 }
             }
             else if(oper.equals("delete")){
@@ -283,7 +302,7 @@ class Demo{
                 int key = Integer.parseInt(key_string);  
                 if(store.contains(key)){
                     store.remove(new Integer(key));
-                    try{  Insert(store); }
+                    try{  Calculate(store,"delete"); }
                     catch(MemoryExceededException mee){
                     	return;
                     } 
@@ -292,10 +311,7 @@ class Demo{
                     System.out.println("Error: Missing key error!\n\tThe entered key does not exist in the database!");
                 }   
             }
-            else{
-                System.out.println("Invalid operation!!");
-            }
-            if(oper.equals("search")){
+            else if(oper.equals("search")){
             	System.out.print("Enter the value of the key to be deleted: ");
             	String key_string = sc.nextLine();
             	int key = Integer.parseInt(key_string);
@@ -305,6 +321,9 @@ class Demo{
             	else{
             		System.out.println("Error: Missing key error!\n\tThe entered key does not exist in the database!");
             	}
+            }
+            else{
+            	System.out.println("Invalid Operation!!");
             }
             num--;
         }
