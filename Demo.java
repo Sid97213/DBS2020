@@ -238,7 +238,7 @@ class Demo{
 		}
 	}
 	public static void search(List<Integer> keys,int x,int bfr,int gd){
-		int mod = x%10; 
+		int mod = x%16; 
 		String s = Integer.toBinaryString(mod);
 		while(s.length()!=4){
         	s='0'+s;
