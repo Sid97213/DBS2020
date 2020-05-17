@@ -4,13 +4,29 @@
  * and open the template in the editor.
  */
 package com.mycompany.extendible_hashing;
-
+import java.util.*;
+import java.io.*;
+import java.util.Map;
+import javax.swing.JOptionPane;
+import com.mycompany.extendible_hashing.display_result_structure;
 /**
  *
  * @author siddhi
  */
+
+class MemoryExceededException extends Exception{
+	MemoryExceededException(List<Integer> keys,String s){
+		front_page obj = new front_page();
+//		System.out.println("Error: Memory Limit Exceeded!!"+"\n"+"The entered key exceeds data structure capacity of bucket "+s+" !!");
+                JOptionPane.showMessageDialog(null,"Error: Memory Limit Exceeded!! The entered key exceeds data structure capacity of bucket "+s+" !!");
+		front_page.Bucket_overflow(keys,s);
+	}
+}
+
 public class front_page extends javax.swing.JFrame {
 
+    static int key;
+    static String bucket;
     /**
      * Creates new form front_page
      */
@@ -30,20 +46,15 @@ public class front_page extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        operation = new javax.swing.JComboBox<>();
         jLabel3 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
+        keyVal = new javax.swing.JTextField();
+        enterButton = new javax.swing.JButton();
+        enterButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setBorder(new javax.swing.border.MatteBorder(null));
-        jPanel1.setForeground(java.awt.Color.black);
 
         jLabel1.setFont(new java.awt.Font("Ubuntu", 0, 28)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -53,129 +64,420 @@ public class front_page extends javax.swing.JFrame {
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Select the operation you wish to perform:");
 
-        jComboBox1.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Insert", "Delete", "Search" }));
+        operation.setFont(new java.awt.Font("Ubuntu", 0, 22)); // NOI18N
+        operation.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Insert", "Delete", "Search" }));
+        operation.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                operationActionPerformed(evt);
+            }
+        });
 
         jLabel3.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("Enter the key value:");
 
-        jTextField1.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        keyVal.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        keyVal.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
-        jButton1.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        jButton1.setText("Enter");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        enterButton.setBackground(new java.awt.Color(204, 204, 204));
+        enterButton.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        enterButton.setText("Enter");
+        enterButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                enterButtonActionPerformed(evt);
             }
         });
 
-        jLabel4.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("Press enter to execute the selected operation:");
-
-        jLabel5.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel5.setText("Global Depth:");
-
-        jLabel6.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel6.setText("BFR:");
-
-        jTextField2.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-
-        jTextField3.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        enterButton1.setBackground(new java.awt.Color(204, 204, 204));
+        enterButton1.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        enterButton1.setText("Back");
+        enterButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                enterButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(47, 47, 47))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(104, 104, 104)
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 388, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(197, 197, 197)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(140, 140, 140)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(242, 242, 242)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(66, 66, 66)
+                        .addGap(71, 71, 71)
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 482, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(51, 51, 51)
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(51, 51, 51)
-                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(244, 244, 244)
+                        .addComponent(keyVal, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(operation, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                            .addGap(140, 140, 140)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(100, 100, 100)
+                        .addComponent(enterButton, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(87, 87, 87)
+                        .addComponent(enterButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(104, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(27, 27, 27)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jTextField3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
-                                .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(4, 4, 4)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(46, 46, 46)
+                .addComponent(operation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(46, 46, 46)
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(29, 29, 29)
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(keyVal, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(27, 27, 27)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(enterButton, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(enterButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(50, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 2, Short.MAX_VALUE))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+    
+    
+    static List<Integer> store = new ArrayList<>();
+    public static List<String> hash_fn(List<Integer> keys){
+		List<String> hash_val = new ArrayList<>();
+		for(Integer x: keys){
+			int mod = x%16; 
+			String s = Integer.toBinaryString(mod);
+			while(s.length()!=4){
+         		s='0'+s;
+        	}
+        	hash_val.add(s);
+		}
+		return hash_val;
+    }
+    public static void Bucket_overflow(List<Integer> keys,String s){
+    	List<String> hash_val = hash_fn(keys);
+    	int[][] array = new int[keys.size()][2];
+		for(int i=0; i<keys.size(); i++){
+			array[i][0] = keys.get(i);
+			array[i][1] = Integer.parseInt(hash_val.get(i));
+		}
+                JOptionPane.showMessageDialog(null,"Overflow bucket '"+s+"' contains keys: ");
+//		System.out.print("Overflow bucket '"+s+"' contains keys: ");
+		for(int i=0; i<keys.size(); i++){
+			String s1 = Integer.toString(array[i][1]);
+			while(s1.length()!=4){
+         		s1='0'+s1;
+        	}
+			if(s1.equals(s)){
+				System.out.print(array[i][0]+"  ");
+			}
+		}
+		System.out.println();
+    }
+    public static String get_last_digits(String hash_val,int num){
+        return (hash_val.substring(4-num,4));
+    }
+    public static int[] get_num(List<String> hash_val,String s1,String s2,int i){
+    	int[] arr = new int[2];
+    	for(String s: hash_val){
+    		if(get_last_digits(s,i).equals(s1)){
+    			arr[0]++;
+    		}
+    		else if(get_last_digits(s,i).equals(s2)){
+    			arr[1]++;
+    		}
+    	}
+    	return arr;
+    }
+    
+    public static List<String> Calculate(List<Integer> keys,String oper,int bfr,int gd) throws MemoryExceededException{
+		List<String> hash_val = hash_fn(keys);
+		int[] counti = new int[2]; 
+		counti[0]=0; counti[1]=0;
+		for(String s: hash_val){
+			if(get_last_digits(s,1).equals("0"))
+				counti[0]++;
+			else if(get_last_digits(s,1).equals("1")){
+				counti[1]++;
+			}
+		}
+		List<String> ans = new ArrayList<>();
+		ans.clear();
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+			if(counti[0]>bfr){
+				int[] arr1 = get_num(hash_val,"00","10",2);
+				if(arr1[0]>bfr){
+					int[] arr2 = get_num(hash_val,"000","100",3);
+					if(arr2[0]>bfr){
+						int[] arr3 = get_num(hash_val,"0000","1000",4);
+						if(arr3[0]>bfr || arr3[1]>bfr){
+							if(arr3[0]>bfr)   throw new MemoryExceededException(keys,"0000");
+							if(arr3[1]>bfr) 	throw new MemoryExceededException(keys,"1000");
+						}
+						else{
+							if(arr3[0]<=bfr) { ans.add("0000");}
+							if( arr3[1]<=bfr) { ans.add("1000");}
+						}
+					}
+					else if(arr2[0]<=bfr) { ans.add("000"); }
+					if(arr2[1]>bfr){
+						int[] arr3 = get_num(hash_val,"0100","1100",4);
+						if(arr3[0]>bfr || arr3[1]>bfr){
+							if(arr3[0]>bfr) throw new MemoryExceededException(keys,"0100");
+							if(arr3[1]>bfr) throw new MemoryExceededException(keys,"1100");
+						}
+						else{
+							if( arr3[0]<=bfr) { ans.add("0100");}
+							if( arr3[1]<=bfr) { ans.add("1100");}
+						}
+					}
+					else if( arr2[1]<=bfr) {  ans.add("100"); }
+				}
+				else if( arr1[0]<=bfr) {  ans.add("00"); }
+				if(arr1[1]>bfr){
+					int[] arr2 = get_num(hash_val,"010","110",3);
+					if(arr2[0]>bfr){
+						int[] arr3 = get_num(hash_val,"0010","1010",4);
+						if(arr3[0]>bfr || arr3[1]>bfr){ 
+							if(arr3[0]>bfr) throw new MemoryExceededException(keys,"0010");
+							if(arr3[1]>bfr) throw new MemoryExceededException(keys,"1010");
+						}
+						else{
+							if(arr3[0]>0 && arr3[0]<=bfr) { ans.add("0010");}
+							if(arr3[1]>0 && arr3[1]<=bfr) { ans.add("1010");}
+						}
+					}
+					else if(arr2[0]>0 && arr2[0]<=bfr) {  ans.add("010"); }
+					if(arr2[1]>bfr){
+						int[] arr3 = get_num(hash_val,"0110","1110",4);
+						if(arr3[0]>2 || arr3[1]>bfr){
+							if(arr3[0]>bfr) throw new MemoryExceededException(keys,"0110");
+							if(arr3[1]>bfr) throw new MemoryExceededException(keys,"1110");
+						}
+						else{
+							if(arr3[0]>0 && arr3[0]<=bfr) { ans.add("0110");}
+							if(arr3[1]>0 && arr3[1]<=bfr) { ans.add("1110");}
+						}
+					}
+					else if(arr2[1]>0 && arr2[1]<=bfr) {  ans.add("110"); }
+				}
+				else if(arr1[0]>0 && arr1[0]<=bfr) {  ans.add("10"); }
+				
+			}
+			else if(counti[0]>0 && counti[0]<=bfr){
+				ans.add("0");
+			}
+			if(counti[1]>bfr){
+				int[] arr1 = get_num(hash_val,"01","11",2);
+				if(arr1[0]>bfr){
+					int[] arr2 = get_num(hash_val,"001","101",3);
+					if(arr2[0]>bfr){
+						int[] arr3 = get_num(hash_val,"0001","1001",4);
+						if(arr3[0]>bfr || arr3[1]>bfr){
+							if(arr3[0]>bfr) throw new MemoryExceededException(keys,"0001");
+							if(arr3[1]>bfr) throw new MemoryExceededException(keys,"1001");
+						}
+						else{
+							if(arr3[0]>0 && arr3[0]<=bfr) { ans.add("0001");}
+							if(arr3[1]>0 && arr3[1]<=bfr) { ans.add("1001");}
+						}
+					}
+					else if(arr2[0]>0 && arr2[0]<=bfr) {  ans.add("001"); }
+					if(arr2[1]>bfr){
+						int[] arr3 = get_num(hash_val,"0101","1101",4);
+						if(arr3[0]>bfr || arr3[1]>bfr){
+						 	if(arr3[0]>bfr) throw new MemoryExceededException(keys,"0101");
+							if(arr3[1]>bfr) throw new MemoryExceededException(keys,"1101");
+						}
+						else{
+							if(arr3[0]>0 && arr3[0]<=bfr) { ans.add("0101");}
+							if(arr3[1]>0 && arr3[1]<=bfr) { ans.add("1101");}
+						}
+					}
+					else if(arr2[1]>0 && arr2[1]<=bfr) {  ans.add("101"); }
+				}
+				else if(arr1[0]>0 && arr1[0]<=bfr) {  ans.add("01"); }
+				if(arr1[1]>bfr){
+					int[] arr2 = get_num(hash_val,"011","111",3);
+					if(arr2[0]>bfr){
+						int[] arr3 = get_num(hash_val,"0011","1011",4);
+						if(arr3[0]>bfr || arr3[1]>bfr){
+							if(arr3[0]>bfr) throw new MemoryExceededException(keys,"0011");
+							if(arr3[1]>bfr) throw new MemoryExceededException(keys,"1011");
+						}
+						else{
+							if(arr3[0]>0 && arr3[0]<=bfr) { ans.add("0011");}
+							if(arr3[1]>0 && arr3[1]<=bfr) { ans.add("1011");}
+						}
+					}
+					else if(arr2[0]>0 && arr2[0]<=bfr) {  ans.add("011"); }
+					if(arr2[1]>bfr){
+						int[] arr3 = get_num(hash_val,"0111","1111",4);
+						if(arr3[0]>bfr || arr3[1]>bfr){
+							if(arr3[0]>bfr) throw new MemoryExceededException(keys,"0111"); 
+							if(arr3[1]>bfr) throw new MemoryExceededException(keys,"1111"); 
+						}
+						else{
+							if(arr3[0]>0 && arr3[0]<=bfr) { ans.add("0111");}
+							if(arr3[1]>0 && arr3[1]<=bfr) { ans.add("1111");}
+						}
+					}
+					else if(arr2[1]>0 && arr2[1]<=bfr) {  ans.add("111"); }
+				}
+				else if(arr1[1]>0 && arr1[1]<=bfr) {  ans.add("11"); }
+			}
+			else if(counti[1]>0 && counti[1]<=bfr){
+				ans.add("1");
+			}
+
+		int[][] array = new int[keys.size()][2];
+		for(int i=0; i<hash_val.size(); i++){
+			array[i][0] = keys.get(i);
+			array[i][1] = Integer.parseInt(hash_val.get(i));
+		}
+		int GD=0;
+		for(String s: ans){
+			if(s.length()>GD){
+				GD=s.length();
+			}
+		}
+		GD = max(GD,gd);
+//		if(oper.equals("Insert")||oper.equals("delete")){
+////			print_result(ans,array,GD);
+//                        display_result_structure disp = new display_result_structure();
+//                        disp.setVisible(true);
+//		}
+		return ans;
+    }
+    public static void search(List<Integer> keys,int x,int bfr,int gd){
+		int mod = x%16; 
+		String s = Integer.toBinaryString(mod);
+		while(s.length()!=4){
+        	s='0'+s;
+                }
+		List<String> buckets = new ArrayList<>();
+		try{
+			buckets = Calculate(keys,"search",bfr,gd);
+		}
+		catch(MemoryExceededException mee) { return;}
+
+		for(String s1: buckets){
+			if(s1.equals(get_last_digits(s,s1.length()))){
+                            bucket = s1;
+                            Search_result sr = new Search_result();
+                            sr.setVisible(true);
+//				JOptionPane.showMessageDialog(null,"Key "+x+" is present in bucket "+s1);
+			}
+		}
+		
+	}
+    public static int max(int x,int y){
+	if(x>y)
+            return x;
+        else 
+            return y;
+    }
+    
+    
+    private void enterButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enterButtonActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+//        JOptionPane.showMessageDialog(null,"something!");
+        int gd = first.gd;
+        int bfr = first.bfr;
+        String oper = (String) operation.getSelectedItem();
+        key = Integer.parseInt(keyVal.getText());
+    
+        
+        if(oper.equals("Insert")){
+//                System.out.print("Enter the value of the key to be inserted: ");
+//                String key_string = sc.nextLine();
+//                int key = Integer.parseInt(key_string); 
+                if(store.contains(key)){
+                    JOptionPane.showMessageDialog(null,"Error: Duplicate key error! This key is already present in the database!");
+//                    System.out.println("Error: Duplicate key error!\n\tThis key is already present in the database!");
+                }
+                else{
+                    store.add(key);
+                    try{  
+                        Calculate(store,"insert",bfr,gd);
+                        display_result_structure disp = new display_result_structure();
+                        disp.setVisible(true);
+                    }
+                    catch(MemoryExceededException mee){
+                    	return;
+                    }
+                }
+        }
+        else if(oper.equals("Delete")){
+//                System.out.print("Enter the value of the key to be deleted: ");
+//                String key_string = sc.nextLine();
+//                int key = Integer.parseInt(key_string);  
+                if(store.contains(key)){
+                    store.remove(new Integer(key));
+                    try{  
+                        Calculate(store,"delete",bfr,gd); 
+                        display_result_structure disp = new display_result_structure();
+                        disp.setVisible(true);
+                    }
+                    catch(MemoryExceededException mee){
+                    	return;
+                    } 
+                } 
+                else{
+                    JOptionPane.showMessageDialog(null,"Error: Missing key error The entered key does not exist in the database!");
+                }   
+        }
+        else if(oper.equals("Search")){
+//            	System.out.print("Enter the value of the key to be deleted: ");
+//            	String key_string = sc.nextLine();
+//            	int key = Integer.parseInt(key_string);
+            	if(store.contains(key)){
+            		search(store,key,bfr,gd);
+                        
+            	}
+            	else{
+            		JOptionPane.showMessageDialog(null,"Error: Missing key error!\n\tThe entered key does not exist in the database!");
+//                        global_depth.setText("");
+//                        bfr_field.setText("");
+                        keyVal.setText("");
+            	}
+            }
+    }//GEN-LAST:event_enterButtonActionPerformed
+
+    private void enterButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enterButton1ActionPerformed
+        // TODO add your handling code here:
+        first f = new first();
+        f.setVisible(true);
+        dispose();
+    }//GEN-LAST:event_enterButton1ActionPerformed
+
+    private void operationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operationActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_operationActionPerformed
 
     /**
      * @param args the command line arguments
@@ -213,17 +515,13 @@ public class front_page extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JButton enterButton;
+    private javax.swing.JButton enterButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField keyVal;
+    private javax.swing.JComboBox<String> operation;
     // End of variables declaration//GEN-END:variables
 }
