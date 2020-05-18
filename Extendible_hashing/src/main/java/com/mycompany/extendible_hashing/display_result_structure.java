@@ -5,6 +5,12 @@
  */
 package com.mycompany.extendible_hashing;
 
+import java.util.Arrays;
+import java.util.Vector;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author siddhi
@@ -16,10 +22,79 @@ public class display_result_structure extends javax.swing.JFrame {
      */
     public display_result_structure() {
         initComponents();
-        jTextField1.setText(Integer.toString(first.gd));
-        jTextField2.setText(Integer.toString(first.bfr));
+        int n = first.gd;
+        int b  = first.bfr;
+        jTextField1.setText(Integer.toString(n));
+        jTextField2.setText(Integer.toString(b));
+//        int[] arr = new int[n]; 
+//        generateAllBinaryStrings(n, arr, 0);
+        
+        DefaultTableModel dtm = new DefaultTableModel(0, 0);
+        String header[] = new String[] { "Directory" };
+
+        // add header in table model     
+         dtm.setColumnIdentifiers(header);
+        //set model into the table object
+        jTable1.setModel(dtm);
+        for (int count = 0; count < Math.pow(2, n); count++) {
+        dtm.addRow(new Object[] {convertDecimalToBinary(count,n)});
+        }
+        DefaultTableModel dtm2 = new DefaultTableModel(0, 0);
+        String header2[] = new String[] { "Bucket", "Value" };
+        dtm2.setColumnIdentifiers(header2);
+        
+        for (int i=1; i<b; i++){
+            dtm2.addColumn("Value");
+        }
+        dtm2.addColumn("Local Depth");
+        jTable2.setModel(dtm2);
+        
+        for(String s: front_page.ans){
+            int count=0;
+            Vector<Object> data = new Vector<Object>();
+            int ld = s.length();
+            data.add(s);
+//			System.out.print("LD: "+s.length()+"  ");
+//			System.out.print("Bucket:"+s+": ");
+			for(int i=0; i<front_page.array1.length; i++){
+				String s1 = Integer.toString(front_page.array1[i][1]);
+				while(s1.length()!=4){
+         		s1='0'+s1;
+        		}
+				if(s.equals(front_page.get_last_digits(s1,s.length()))){
+//					System.out.print(front_page.array1[i][0]+"  ");
+                                        int val = front_page.array1[i][0];
+                                        data.add(val);
+                                        count++;
+				}
+			}
+                        while (count < b){
+                            data.add(" ");
+                            count++;
+                        }
+                        data.add(ld);
+                        dtm2.addRow(data);
+//			System.out.println();
+            }
+            
     }
 
+    public String convertDecimalToBinary(int N, int n) {
+
+    StringBuilder binary = new StringBuilder(32);
+
+    while (N > 0 ) {
+        binary.append( N % 2 );
+        N >>= 1;
+     }
+    while(binary.length()!= n){
+        binary.append(0);
+    }
+
+    return binary.reverse().toString();
+
+    }
+     
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -96,9 +171,6 @@ public class display_result_structure extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(177, 177, 177)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(39, 39, 39)
@@ -118,7 +190,10 @@ public class display_result_structure extends javax.swing.JFrame {
                                 .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(177, 177, 177)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(35, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -134,16 +209,23 @@ public class display_result_structure extends javax.swing.JFrame {
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jTextField2))
                 .addGap(60, 60, 60)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addGap(40, 40, 40)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, Short.MAX_VALUE)))
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(30, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    public display_result_structure(JTable jTable1) {
+        this.jTable1 = jTable1;
+    }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:

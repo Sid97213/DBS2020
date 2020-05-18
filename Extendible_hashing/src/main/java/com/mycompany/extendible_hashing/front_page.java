@@ -27,6 +27,8 @@ public class front_page extends javax.swing.JFrame {
 
     static int key;
     static String bucket;
+    static List<String> ans = new ArrayList<>();
+    static int[][] array1;
     /**
      * Creates new form front_page
      */
@@ -225,7 +227,7 @@ public class front_page extends javax.swing.JFrame {
 				counti[1]++;
 			}
 		}
-		List<String> ans = new ArrayList<>();
+		
 		ans.clear();
 
 			if(counti[0]>bfr){
@@ -354,10 +356,10 @@ public class front_page extends javax.swing.JFrame {
 				ans.add("1");
 			}
 
-		int[][] array = new int[keys.size()][2];
+		array1 = new int[keys.size()][2];
 		for(int i=0; i<hash_val.size(); i++){
-			array[i][0] = keys.get(i);
-			array[i][1] = Integer.parseInt(hash_val.get(i));
+			array1[i][0] = keys.get(i);
+			array1[i][1] = Integer.parseInt(hash_val.get(i));
 		}
 		int GD=0;
 		for(String s: ans){
