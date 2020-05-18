@@ -20,6 +20,11 @@ class MemoryExceededException extends Exception{
 //		System.out.println("Error: Memory Limit Exceeded!!"+"\n"+"The entered key exceeds data structure capacity of bucket "+s+" !!");
                 JOptionPane.showMessageDialog(null,"Error: Memory Limit Exceeded!! The entered key exceeds data structure capacity of bucket "+s+" !!");
 		front_page.Bucket_overflow(keys,s);
+                first ft = new first();
+                ft.setVisible(true);
+                 fp.dispose(); 
+              
+//                
 	}
 }
 
@@ -29,6 +34,7 @@ public class front_page extends javax.swing.JFrame {
     static String bucket;
     static List<String> ans = new ArrayList<>();
     static int[][] array1;
+    static int gdf = first.gd;
     /**
      * Creates new form front_page
      */
@@ -371,6 +377,7 @@ public class front_page extends javax.swing.JFrame {
 			}
 		}
 		GD = max(GD,gd);
+                gdf = GD;
 //		if(oper.equals("Insert")||oper.equals("delete")){
 ////			print_result(ans,array,GD);
 //                        display_result_structure disp = new display_result_structure();
@@ -411,7 +418,7 @@ public class front_page extends javax.swing.JFrame {
     private void enterButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enterButtonActionPerformed
         // TODO add your handling code here:
 //        JOptionPane.showMessageDialog(null,"something!");
-        int gd = first.gd;
+        
         int bfr = first.bfr;
         String oper = (String) operation.getSelectedItem();
         key = Integer.parseInt(keyVal.getText());
@@ -423,16 +430,18 @@ public class front_page extends javax.swing.JFrame {
 //                int key = Integer.parseInt(key_string); 
                 if(store.contains(key)){
                     JOptionPane.showMessageDialog(null,"Error: Duplicate key error! This key is already present in the database!");
+                    keyVal.setText("");
 //                    System.out.println("Error: Duplicate key error!\n\tThis key is already present in the database!");
                 }
                 else{
                     store.add(key);
                     try{  
-                        Calculate(store,"insert",bfr,gd);
+                        Calculate(store,"insert",bfr,gdf);
                         display_result_structure disp = new display_result_structure();
                         disp.setVisible(true);
                     }
                     catch(MemoryExceededException mee){
+                        dispose();
                     	return;
                     }
                 }
@@ -444,16 +453,20 @@ public class front_page extends javax.swing.JFrame {
                 if(store.contains(key)){
                     store.remove(new Integer(key));
                     try{  
-                        Calculate(store,"delete",bfr,gd); 
+                        Calculate(store,"delete",bfr,gdf); 
                         display_result_structure disp = new display_result_structure();
                         disp.setVisible(true);
                     }
                     catch(MemoryExceededException mee){
+//                        first ft = new first();
+//                        ft.setVisible(true);
+//                       dispose();
                     	return;
                     } 
                 } 
                 else{
                     JOptionPane.showMessageDialog(null,"Error: Missing key error The entered key does not exist in the database!");
+                    keyVal.setText("");
                 }   
         }
         else if(oper.equals("Search")){
@@ -461,7 +474,7 @@ public class front_page extends javax.swing.JFrame {
 //            	String key_string = sc.nextLine();
 //            	int key = Integer.parseInt(key_string);
             	if(store.contains(key)){
-            		search(store,key,bfr,gd);
+            		search(store,key,bfr,gdf);
                         
             	}
             	else{
@@ -514,7 +527,8 @@ public class front_page extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new front_page().setVisible(true);
+                front_page fp = new front_page();
+                fp.setVisible(true);
             }
         });
     }
