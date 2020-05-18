@@ -719,9 +719,9 @@ class Relations{
         int key_len=key.length();
         List <String> key_subsets= new ArrayList<>();
         
-        for(int i=0; i< (1<<key_len); i++){
+        for(int i=0; i< (1<<key_len); i++){                             //{A,B,C,D,E,F,G,H,I,J}
             String sub1="";
-            for(int j=0; j<key_len; j++){
+            for(int j=0; j<key_len; j++){                               //{AB->C,AD->G,AD->H,BD->E,BD->F,A->I,H->J}
                 if((i & (1<<j))>0){
                     sub1=sub1+key.charAt(j);
                 }
@@ -773,9 +773,52 @@ class Relations{
             rels.add(rel_schema);
         }
         System.out.println("Decomposed relations satisfying NF2:");
-        for(String r1: rels){
-            System.out.println(r1);
-        }        
+
+        for(String l: rels){
+            String t1="";
+            String f1="";
+            List<String> keys=new ArrayList<>(); 
+            t1=t1+'{';
+            for(int i=0; i<l.length(); i++){
+                if(i==l.length()-1){
+                    t1=t1 + l.charAt(i);
+                }
+                else{
+                t1=t1 + l.charAt(i)+',';
+                }
+            }
+            t1=t1+'}';
+            f1=f1+'{';
+            int x=0;
+            for(String lf: fd_set){
+                if(x==fd_set.size()-1){
+                    int present=1;
+                    for(int li=0; li<lf.length(); li++){
+                        if((t1.indexOf(lf.charAt(li))==-1) && lf.charAt(li)!='-' && lf.charAt(li)!='>'){
+                            present=0;
+                        }
+                    }
+                    if (present==1){
+                        f1=f1+lf;
+                    }
+                }
+                else{
+                    int present=1;
+                    for(int li=0; li<lf.length(); li++){
+                        if((t1.indexOf(lf.charAt(li))==-1) && lf.charAt(li)!='-' && lf.charAt(li)!='>'){
+                            present=0;
+                        }
+                    }
+                    if (present==1){
+                        f1=f1+lf+',';
+                    }
+                }
+                x++;
+            }
+            f1=f1+'}';
+            keys=candidate_key(t1, f1);
+            System.out.println(t1 + " with its key being: " + keys.get(0));
+        }
     }
 
     public static void nf3_normalisation(Relations r, String key){ //normalises the given relation to 3nf regardless of the nf it is in
@@ -839,7 +882,51 @@ class Relations{
         }
         System.out.println("Decomposed relations satisfying NF3:");
         for(String l: rels){
-            System.out.println(l);
+            String t1="";
+            String f1="";
+            List<String> keys=new ArrayList<>(); 
+            t1=t1+'{';
+            for(int i=0; i<l.length(); i++){
+                if(i==l.length()-1){
+                    t1=t1 + l.charAt(i);
+                }
+                else{
+                t1=t1 + l.charAt(i)+',';
+                }
+            }
+            t1=t1+'}';
+            f1=f1+'{';
+            int x=0;
+            for(String lf: fd_set){
+                if(x==fd_set.size()-1){
+                    int present=1;
+                    for(int li=0; li<lf.length(); li++){
+                        if((t1.indexOf(lf.charAt(li))==-1) && lf.charAt(li)!='-' && lf.charAt(li)!='>'){
+                            present=0;
+                        }
+                    }
+                    if (present==1){
+                        f1=f1+lf;
+                    }
+                }
+                else{
+                    int present=1;
+                    for(int li=0; li<lf.length(); li++){
+                        if((t1.indexOf(lf.charAt(li))==-1) && lf.charAt(li)!='-' && lf.charAt(li)!='>'){
+                            present=0;
+                        }
+                    }
+                    if (present==1){
+                        f1=f1+lf+',';
+                    }
+                }
+                x++;
+            }
+            f1=f1+'}';
+            // System.out.println(f1);
+            keys=candidate_key(t1, f1);
+            System.out.println(t1 + " with its key being: " + keys.get(0));
+            // System.out.println(l);
         }
     }
 
@@ -1088,8 +1175,10 @@ class DBS{
             System.out.println("The decomposed bcnf relations are: ");
             r1.convert_to_bcnf(r1);
         }
-        //
-        // r1.nf3_normalisation(r1, arr.get(0));
+
+
+        
+        // r1.nf2_normalisation(r1, arr.get(0));
         //r1.nf3_normalisation(r1, arr.get(0));
     }
 }
