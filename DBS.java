@@ -721,7 +721,7 @@ class Relations{
         
         for(int i=0; i< (1<<key_len); i++){                             //{A,B,C,D,E,F,G,H,I,J}
             String sub1="";
-            for(int j=0; j<key_len; j++){                               //{AB->C,AD->G,AD->H,BD->E,BD->F,A->I,H->J}
+            for(int j=0; j<key_len; j++){                               //{AB->C,AD->GH,BD->EF,A->I,H->J}
                 if((i & (1<<j))>0){
                     sub1=sub1+key.charAt(j);
                 }
@@ -731,46 +731,32 @@ class Relations{
             }
         }
         Collections.sort(key_subsets, Comparator.comparing(String::length)); //sorting key_subsets by the length of the strings
-
-        // System.out.println("Subsets:");
-        // for(String d: key_subsets){
-        //     System.out.println(d);
-        // }
-    
-        //Making the map by marking the subset keys one by one
-        Map<Character, Integer> map = new HashMap<>();
         
         for(String s: key_subsets){
             // System.out.println("Considering subset: "+s+" for relations" );
             String rel_schema="";
-            Map<Character, Integer> ret_map= new HashMap<>();
-            for(int j=1; j<r.relation.length(); j=j+2){
-                map.put(r.relation.charAt(j), 0);
-            }
+            List<Character> attr_list= new ArrayList<>();
+            
             for(int i=0; i<s.length(); i++){
-                map.put(s.charAt(i), 1);
+                attr_list.add(s.charAt(i));
                 rel_schema=rel_schema+ s.charAt(i);
             }
-            // System.out.println("Map being passed to closure:");
-            // for(Map.Entry<Character, Integer> m: map.entrySet()){
-            //     System.out.println(m);
-            // }
-            ret_map.putAll(closure(map, fd_set));
+            // System.out.println("Set being passed to closure:");
+            // System.out.println(attr_list);
+            HashSet<Character> ret_set= new HashSet<Character>();
+            ret_set=closure_calc(attr_list, fd_set);
             // System.out.println("You can get to i.e., return of closure:");
-            // for(Map.Entry<Character, Integer> m: ret_map.entrySet()){
-            //     System.out.println(m);
-            // }
-            for(Map.Entry<Character,Integer> m: ret_map.entrySet()){
-                char c;
-                if(1==m.getValue()){
-                    c=m.getKey();
-                    String re=Arrays.toString(convertString(rels));
-                    if(rel_schema.indexOf(c)==-1 && re.indexOf(c)==-1){                                     
-                        rel_schema=rel_schema+c;
-                    }
+            // System.out.println(ret_set);
+
+            for(Character c1: ret_set){
+                String re=Arrays.toString(convertString(rels));
+                if(rel_schema.indexOf(c1)==-1 && re.indexOf(c1)==-1){                                     
+                    rel_schema=rel_schema+c1;
                 }
             }
-            rels.add(rel_schema);
+            if(rel_schema.length()>1){
+                rels.add(rel_schema);
+            }
         }
         System.out.println("Decomposed relations satisfying NF2:");
 
@@ -863,7 +849,7 @@ class Relations{
             }
             // System.out.println("Schema to add:"+schema1);
             if(flag_var==1){
-                if(!rels.contains(schema1)){
+                if(!rels.contains(schema1) && schema1.length()>1){
                     rels.add(schema1);
                     // System.out.println(schema1+" added");
                 }
@@ -1176,10 +1162,9 @@ class DBS{
             r1.convert_to_bcnf(r1);
         }
 
-
-        
+       
         // r1.nf2_normalisation(r1, arr.get(0));
-        //r1.nf3_normalisation(r1, arr.get(0));
+        // r1.nf3_normalisation(r1, arr.get(0));
     }
 }
 
