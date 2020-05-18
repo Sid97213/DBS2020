@@ -181,24 +181,27 @@ public class front_page extends javax.swing.JFrame {
 		return hash_val;
     }
     public static void Bucket_overflow(List<Integer> keys,String s){
+        String str = "";
     	List<String> hash_val = hash_fn(keys);
     	int[][] array = new int[keys.size()][2];
 		for(int i=0; i<keys.size(); i++){
 			array[i][0] = keys.get(i);
 			array[i][1] = Integer.parseInt(hash_val.get(i));
 		}
-                JOptionPane.showMessageDialog(null,"Overflow bucket '"+s+"' contains keys: ");
+                
 //		System.out.print("Overflow bucket '"+s+"' contains keys: ");
-		for(int i=0; i<keys.size(); i++){
+		for(int i=0; i<keys.size()-1; i++){
 			String s1 = Integer.toString(array[i][1]);
 			while(s1.length()!=4){
          		s1='0'+s1;
         	}
 			if(s1.equals(s)){
-				System.out.print(array[i][0]+"  ");
+//				System.out.print(array[i][0]+"  ");
+                                str +=array[i][0]+ " ";
 			}
 		}
-		System.out.println();
+                JOptionPane.showMessageDialog(null,"Overflow bucket '"+s+"' contains keys: " + str);
+//		System.out.println();
     }
     public static String get_last_digits(String hash_val,int num){
         return (hash_val.substring(4-num,4));
