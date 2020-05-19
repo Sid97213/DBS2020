@@ -22,7 +22,7 @@ public class display_result_structure extends javax.swing.JFrame {
      */
     public display_result_structure() {
         initComponents();
-        int n = first.gd;
+        int n = front_page.gdf;
         int b  = first.bfr;
         jTextField1.setText(Integer.toString(n));
         jTextField2.setText(Integer.toString(b));
@@ -130,6 +130,7 @@ public class display_result_structure extends javax.swing.JFrame {
         jTextField1.setEditable(false);
         jTextField1.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
 
+        jTextField2.setEditable(false);
         jTextField2.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(

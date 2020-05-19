@@ -20,6 +20,11 @@ class MemoryExceededException extends Exception{
 //		System.out.println("Error: Memory Limit Exceeded!!"+"\n"+"The entered key exceeds data structure capacity of bucket "+s+" !!");
                 JOptionPane.showMessageDialog(null,"Error: Memory Limit Exceeded!! The entered key exceeds data structure capacity of bucket "+s+" !!");
 		front_page.Bucket_overflow(keys,s);
+                first ft = new first();
+                ft.setVisible(true);
+                  
+              
+//                
 	}
 }
 
@@ -29,6 +34,7 @@ public class front_page extends javax.swing.JFrame {
     static String bucket;
     static List<String> ans = new ArrayList<>();
     static int[][] array1;
+    static int gdf = first.gd;
     /**
      * Creates new form front_page
      */
@@ -181,24 +187,27 @@ public class front_page extends javax.swing.JFrame {
 		return hash_val;
     }
     public static void Bucket_overflow(List<Integer> keys,String s){
+        String str = "";
     	List<String> hash_val = hash_fn(keys);
     	int[][] array = new int[keys.size()][2];
 		for(int i=0; i<keys.size(); i++){
 			array[i][0] = keys.get(i);
 			array[i][1] = Integer.parseInt(hash_val.get(i));
 		}
-                JOptionPane.showMessageDialog(null,"Overflow bucket '"+s+"' contains keys: ");
+                
 //		System.out.print("Overflow bucket '"+s+"' contains keys: ");
-		for(int i=0; i<keys.size(); i++){
+		for(int i=0; i<keys.size()-1; i++){
 			String s1 = Integer.toString(array[i][1]);
 			while(s1.length()!=4){
          		s1='0'+s1;
         	}
 			if(s1.equals(s)){
-				System.out.print(array[i][0]+"  ");
+//				System.out.print(array[i][0]+"  ");
+                                str +=array[i][0]+ " ";
 			}
 		}
-		System.out.println();
+                JOptionPane.showMessageDialog(null,"Overflow bucket '"+s+"' contains keys: " + str);
+//		System.out.println();
     }
     public static String get_last_digits(String hash_val,int num){
         return (hash_val.substring(4-num,4));
@@ -368,6 +377,7 @@ public class front_page extends javax.swing.JFrame {
 			}
 		}
 		GD = max(GD,gd);
+                gdf = GD;
 //		if(oper.equals("Insert")||oper.equals("delete")){
 ////			print_result(ans,array,GD);
 //                        display_result_structure disp = new display_result_structure();
@@ -408,7 +418,7 @@ public class front_page extends javax.swing.JFrame {
     private void enterButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enterButtonActionPerformed
         // TODO add your handling code here:
 //        JOptionPane.showMessageDialog(null,"something!");
-        int gd = first.gd;
+        
         int bfr = first.bfr;
         String oper = (String) operation.getSelectedItem();
         key = Integer.parseInt(keyVal.getText());
@@ -420,16 +430,18 @@ public class front_page extends javax.swing.JFrame {
 //                int key = Integer.parseInt(key_string); 
                 if(store.contains(key)){
                     JOptionPane.showMessageDialog(null,"Error: Duplicate key error! This key is already present in the database!");
+                    keyVal.setText("");
 //                    System.out.println("Error: Duplicate key error!\n\tThis key is already present in the database!");
                 }
                 else{
                     store.add(key);
                     try{  
-                        Calculate(store,"insert",bfr,gd);
+                        Calculate(store,"insert",bfr,gdf);
                         display_result_structure disp = new display_result_structure();
                         disp.setVisible(true);
                     }
                     catch(MemoryExceededException mee){
+                        dispose();
                     	return;
                     }
                 }
@@ -441,16 +453,20 @@ public class front_page extends javax.swing.JFrame {
                 if(store.contains(key)){
                     store.remove(new Integer(key));
                     try{  
-                        Calculate(store,"delete",bfr,gd); 
+                        Calculate(store,"delete",bfr,gdf); 
                         display_result_structure disp = new display_result_structure();
                         disp.setVisible(true);
                     }
                     catch(MemoryExceededException mee){
+//                        first ft = new first();
+//                        ft.setVisible(true);
+//                       dispose();
                     	return;
                     } 
                 } 
                 else{
                     JOptionPane.showMessageDialog(null,"Error: Missing key error The entered key does not exist in the database!");
+                    keyVal.setText("");
                 }   
         }
         else if(oper.equals("Search")){
@@ -458,7 +474,7 @@ public class front_page extends javax.swing.JFrame {
 //            	String key_string = sc.nextLine();
 //            	int key = Integer.parseInt(key_string);
             	if(store.contains(key)){
-            		search(store,key,bfr,gd);
+            		search(store,key,bfr,gdf);
                         
             	}
             	else{
