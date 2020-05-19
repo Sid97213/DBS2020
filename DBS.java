@@ -371,13 +371,14 @@ class Relations{
             fd_set0.remove(new String(s1));
         }
 
-        for(String s: fd_set0){ 
+        
+        /*for(String s: fd_set0){ 
             //System.out.println(s);                                  //removing redundant fd 
             char[] sch = s.toCharArray();
             if((sch[0]==s.charAt(s.length()-1))&&(s.charAt(1)=='-')){
-                fd_set0.remove(s);
+                fd_set0.remove(new String(s));
             }
-        }
+        }*/
         List<String> fd_set = loop_transitive_fd(fd_set0);
         return fd_set;
     }
@@ -971,6 +972,9 @@ class Relations{
                 for(Character a: alpha){
                     System.out.print(a);
                 }System.out.println();
+                if(union.size()==1){
+                    return;
+                }
                 
                 Set<Character> difference = new HashSet<Character>(beta); 
                 difference.removeAll(alpha); 
@@ -978,14 +982,19 @@ class Relations{
                 difference1.removeAll(difference); 
                 Relations r1 = new Relations("",""); 
                 r1 = convert_to_Relation(difference1,fd_set); 
+                //System.out.println(r1.relation+"  "+r1.fd);
                 List<String> super_key_r = r1.candidate_key(r1.relation,r1.fd); 
                 List<String> fd_set1 = new ArrayList<>();
                 StringTokenizer st3 = new StringTokenizer(r1.fd, ",{}"); 
                 while (st3.hasMoreTokens()) {
                     fd_set1.add(st3.nextToken());
                 }
+                /*for(String s6: super_key_r){
+                    System.out.println(s6);
+                }*/
+
                 if(check_bcnf(super_key_r,fd_set1)){
-                    System.out.print("Relation : ");
+                    System.out.print("Relation2 : ");
                     System.out.print(difference1);    System.out.print("\t");
                     String s1=""; 
                     for(Character a: difference1){
@@ -1157,10 +1166,10 @@ class DBS{
         else if(n==2){
             r1.nf3_normalisation(r1,arr.get(0));
         }
-        else if(n==3){
+        //else if(n==3){
             System.out.println("The decomposed bcnf relations are: ");
             r1.convert_to_bcnf(r1);
-        }
+        //}
 
        
         // r1.nf2_normalisation(r1, arr.get(0));
