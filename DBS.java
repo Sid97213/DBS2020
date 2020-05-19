@@ -168,9 +168,12 @@ class HighestNF
 
         //check for 3nf
         // for X->Y, either X is a super key or Y is a prime attribute
+        // int check=1;
+        hnf=3;
         for (int i=0; i<right.length; i++) {
             String lhs = left[i];
             int flag1=0;
+
             for(String key : SuperKeys.super_key)
             {
                 if (anagrams(lhs, key))
@@ -192,12 +195,16 @@ class HighestNF
             }
             if (flag2 == 1)                         //second condition false
             {
-                // hnf = 2;
+                hnf = 2;
+                // check=0;
                 break;
                 // return;
             }
         }
-        hnf=3;
+        // if (check ==1){
+        //     hnf=3;
+        // }
+        
 
         //check for bcnf
         // for every X->Y, X should be a super key
