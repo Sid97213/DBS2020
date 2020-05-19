@@ -196,7 +196,7 @@ public class front_page extends javax.swing.JFrame {
 		}
                 
 //		System.out.print("Overflow bucket '"+s+"' contains keys: ");
-		for(int i=0; i<keys.size()-1; i++){
+		for(int i=0; i<keys.size(); i++){
 			String s1 = Integer.toString(array[i][1]);
 			while(s1.length()!=4){
          		s1='0'+s1;
