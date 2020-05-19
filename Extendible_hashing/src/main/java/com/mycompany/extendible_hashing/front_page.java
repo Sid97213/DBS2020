@@ -22,7 +22,7 @@ class MemoryExceededException extends Exception{
 		front_page.Bucket_overflow(keys,s);
                 first ft = new first();
                 ft.setVisible(true);
-                 fp.dispose(); 
+                  
               
 //                
 	}
@@ -527,8 +527,7 @@ public class front_page extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                front_page fp = new front_page();
-                fp.setVisible(true);
+                new front_page().setVisible(true);
             }
         });
     }
