@@ -1,230 +1,19 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package frames;
 import java.io.*;
 import java.util.*;
 import java.util.Map;
 import java.util.Dictionary;
+import java.util.List;
 
-class SuperKeys
-{
-    static Set<String> super_key = new HashSet<String>();
-    void func(String[] arr, int n, Dictionary vis, String data[], String left[], String right[])
-    {
-        // int no_of_attributes = n;
-        int num_fd = left.length;
-        int ch = 1;
-        for (int j = 0; j < n; j++)
-        {
-            if ((int)vis.get(arr[j]) == 0)
-            {
-                ch = 0;
-                break;
-            }
-        }
-        if (ch == 1) return;
-        for (int i = 0; i < num_fd; i++)
-        {
-            int check = 1;
-            for (int j = 0; j < n; j++)
-            {
-                if ((int)vis.get(arr[j]) == 0)
-                {
-                    check = 0;
-                    break;
-                }
-            }
-            if (check == 1) 
-            {
-                break;
-            }
-            check = 1;
-            for (int j=0; j<left[i].length(); j++) {
-                String tmp = Character.toString(left[i].charAt(j));
-                if ((int)vis.get(tmp) == 0)
-                    {
-                        check = 0;
-                        break;
-                    }
-            }
-            if (check == 1)
-            {
-                int rec = 0;
-                for (int j=0; j<right[i].length(); j++) {
-                    String tmp = Character.toString(right[i].charAt(j));
-                    if ((int)vis.get(tmp) == 0) rec = 1;
-                            vis.put(tmp, 1);
-                }
-                if (rec == 1) func(arr, n, vis, data, left, right);
-            }
-        }
-        int chh = 1;
-        for (int j = 0; j < n; j++)
-        {
-            if ((int)vis.get(arr[j]) == 0)
-            {
-                chh = 0;
-                break;
-            }
-        }
-        if (chh == 1)
-        {
-            String tmp = "";
-            for (int i = 0; i < data.length; i++)
-            {   
-                tmp += data[i];
-            }
-            super_key.add(tmp);
-        }   
-    }
-}
-
-class HighestNF
-{
-    static int hnf = 1;
-
-    static boolean anagrams(String lhs, String key) 
-    { 
-        int n1 = lhs.length(); 
-        int n2 = key.length(); 
-
-        if (n1 != n2) 
-            return false; 
-  
-        // Sorting both strings 
-        char[] ch1 = lhs.toCharArray(); 
-        char[] ch2 = key.toCharArray(); 
-        Arrays.sort(ch1); 
-        Arrays.sort(ch2); 
-  
-        // Comparing sorted strings 
-        for (int i = 0; i < n1; i++) 
-            if (ch1[i] != ch2[i]) 
-                return false; 
-  
-        return true; 
-    }
-
-    void highest_nf(String attributes[], int n, String left[], String right[], List<String> arr)
-    {
-        int num_attr = n;
-        Dictionary prime_attr = new Hashtable();
-        for (int i = 0; i < num_attr; i++){
-            prime_attr.put(attributes[i], 0);
-        }
-        for(String key : arr){
-            for (int i=0; i<key.length(); i++) {
-                prime_attr.put(Character.toString(key.charAt(i)),1);
-            }
-        }
-
-        //check for 2nf
-        // presence of partial dependency
-        int pd=0;
-        for (int i=0; i<right.length; i++) 
-        {
-            String rhs = right[i];
-            for (int j=0; j<rhs.length(); j++) 
-            {
-                if ((int)prime_attr.get(Character.toString(rhs.charAt(j)))==0)          //only need to check if RHS is non-candidate
-                {              
-                    String lhs = left[i];
-                    for(String key : arr)
-                    {
-                        Dictionary dic3 = new Hashtable();      //candidate keys
-                        Dictionary dic4 = new Hashtable();      //lhs
-                        for (int z = 0; z < num_attr; z++) 
-                        {
-                            dic3.put(attributes[z], 0); 
-                            dic4.put(attributes[z], 0); 
-                        }
-                        for (int k=0; k<key.length(); k++) {
-                           dic3.put(Character.toString(key.charAt(k)),1);
-                        }
-                        for (int k=0; k<lhs.length(); k++) {
-                           dic4.put(Character.toString(lhs.charAt(k)),1);
-                        }
-                        int flag1 = 0;
-                        int flag2 = 0;
-                        for (int k = 0; k < num_attr; k++)
-                        {
-                            if ((int)dic3.get(attributes[k]) == 0 && (int)dic4.get(attributes[k]) == 1) flag1 = 1;
-                            if ((int)dic3.get(attributes[k]) == 1 && (int)dic4.get(attributes[k]) == 0) flag2 = 1;
-                        }
-
-                        if (flag1 == 0 && flag2 == 1)
-                        { 
-                            pd = 1;
-                            break;
-                        }
-                    }               
-                }if (pd == 1) break; 
-            }if (pd == 1) break;
-
-        }
-        if (pd== 1)
-        {
-            hnf=1;
-            return;
-        }
-        hnf=2;
-
-        //check for 3nf
-        // for X->Y, either X is a super key or Y is a prime attribute
-        for (int i=0; i<right.length; i++) {
-            String lhs = left[i];
-            int flag1=0;
-            for(String key : SuperKeys.super_key)
-            {
-                if (anagrams(lhs, key))
-                {
-                    flag1 = 1;
-                    break;
-                }
-            }
-            if (flag1==1) continue;                 //first condition is true
-            int flag2 = 0;
-            String rhs = right[i]; 
-            for (int j=0; j<rhs.length(); j++)
-            {
-                if ((int)prime_attr.get(Character.toString(rhs.charAt(j))) == 0)
-                {
-                    flag2 = 1;
-                    break;
-                }
-            }
-            if (flag2 == 1)                         //second condition false
-            {
-                // hnf = 2;
-                break;
-                // return;
-            }
-        }
-        hnf=3;
-
-        //check for bcnf
-        // for every X->Y, X should be a super key
-        for (int i = 0; i < right.length; i++)
-        {
-            String lhs = left[i];
-            int flag1 = 0;
-            for(String key : SuperKeys.super_key)
-            {
-                if (anagrams(lhs, key))
-                {
-                    flag1 = 1;
-                    break;
-                }
-            }
-            if (flag1 == 0)
-            {
-                hnf = 3;
-                // break;
-                return;
-            }
-        }
-        hnf = -1;
-        return;
-    }
-}
-
+/**
+ *
+ * @author PARTH KRISHNA SHARMA
+ */
 
 class Relations{
     String relation; String fd;
@@ -371,24 +160,13 @@ class Relations{
             fd_set0.remove(new String(s1));
         }
 
-<<<<<<< HEAD
-        
-        /*for(String s: fd_set0){ 
-            //System.out.println(s);                                  //removing redundant fd 
-            char[] sch = s.toCharArray();
-            if((sch[0]==s.charAt(s.length()-1))&&(s.charAt(1)=='-')){
-                fd_set0.remove(new String(s));
-            }
-        }*/
-=======
-        // for(String s: fd_set0){ 
-        //     //System.out.println(s);                                  //removing redundant fd 
-        //     char[] sch = s.toCharArray();
-        //     if((sch[0]==s.charAt(s.length()-1))&&(s.charAt(1)=='-')){
-        //         fd_set0.remove(s);
-        //     }
-        // }
->>>>>>> 2d244d5c2f6c8a6ac570109acc1697d48e22d92b
+//        for(String s: fd_set0){ 
+//            //System.out.println(s);                                  //removing redundant fd 
+//            char[] sch = s.toCharArray();
+//            if((sch[0]==s.charAt(s.length()-1))&&(s.charAt(1)=='-')){
+//                fd_set0.remove(s);
+//            }
+//        }
         List<String> fd_set = loop_transitive_fd(fd_set0);
         return fd_set;
     }
@@ -982,35 +760,21 @@ class Relations{
                 for(Character a: alpha){
                     System.out.print(a);
                 }System.out.println();
-<<<<<<< HEAD
-                if(union.size()==1){
-                    return;
-                }
                 
-=======
-                if (union.size()==1){
-                    return;
-                }
->>>>>>> 2d244d5c2f6c8a6ac570109acc1697d48e22d92b
                 Set<Character> difference = new HashSet<Character>(beta); 
                 difference.removeAll(alpha); 
                 Set<Character> difference1 = new HashSet<Character>(r_set); 
                 difference1.removeAll(difference); 
                 Relations r1 = new Relations("",""); 
                 r1 = convert_to_Relation(difference1,fd_set); 
-                //System.out.println(r1.relation+"  "+r1.fd);
                 List<String> super_key_r = r1.candidate_key(r1.relation,r1.fd); 
                 List<String> fd_set1 = new ArrayList<>();
                 StringTokenizer st3 = new StringTokenizer(r1.fd, ",{}"); 
                 while (st3.hasMoreTokens()) {
                     fd_set1.add(st3.nextToken());
                 }
-                /*for(String s6: super_key_r){
-                    System.out.println(s6);
-                }*/
-
                 if(check_bcnf(super_key_r,fd_set1)){
-                    System.out.print("Relation2 : ");
+                    System.out.print("Relation : ");
                     System.out.print(difference1);    System.out.print("\t");
                     String s1=""; 
                     for(Character a: difference1){
@@ -1080,129 +844,187 @@ class Relations{
     }
 }
 
-class DBS{ 
+public class Start extends javax.swing.JFrame {
 
-    static void combinationUtil(String[] arr, int n, int r, int index, String data[], int i, String left[], String right[]) 
-    {
-        if (index == r) 
-        {
-            Dictionary vis = new Hashtable(); 
-            for (int j = 0; j < n; j++)
-            {
-                vis.put(arr[j], 0);
+    static List<String> arr;
+    static String relation;
+    static String fd;
+    /**
+     * Creates new form Start
+     */
+    public Start() {
+        initComponents();
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jTextField2 = new javax.swing.JTextField();
+        jButton2 = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jLabel1.setBackground(new java.awt.Color(0, 204, 255));
+        jLabel1.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel1.setText("MODULE 1");
+
+        jLabel2.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLabel2.setText("Enter the relational attributes (Eg.  {A,B,C})");
+
+        jTextField1.setBackground(new java.awt.Color(255, 255, 0));
+        jTextField1.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
             }
-            for (int j = 0; j < r; j++) vis.put(data[j], 1); 
-            SuperKeys c = new SuperKeys();
-            c.func(arr, n, vis, data, left, right);
-            return; 
-        }
-        if (i >= n) 
-            return; 
-        data[index] = (arr[i]); 
-        combinationUtil(arr, n, r, index + 1, data, i + 1, left, right); 
-        combinationUtil(arr, n, r, index, data, i + 1, left, right); 
-    }
+        });
 
-    static void Combinations(String[] arr, int n, int r, String left[], String right[]) 
-    {
-        String data[] = new String[r];
-        combinationUtil(arr, n, r, 0, data, 0, left, right); 
-    }
+        jLabel3.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLabel3.setText("Enter the functional dependencies (Eg.  {AB->C,C->B})");
 
-    public static void main(String[] args){
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter the relation scheme: ");
-        String relation = sc.nextLine();
-        System.out.print("Enter the functional dependencies in the relation: ");
-        String fd = sc.nextLine();
+        jTextField2.setBackground(new java.awt.Color(255, 255, 0));
+        jTextField2.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField2ActionPerformed(evt);
+            }
+        });
 
+        jButton2.setText("Compute Candidate Keys");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(187, 187, 187)
+                        .addComponent(jLabel1))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 395, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 435, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 435, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(153, 153, 153)
+                        .addComponent(jButton2)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(43, 43, 43)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(28, 28, 28)
+                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(52, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField2ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        relation = jTextField1.getText();
+        fd = jTextField2.getText();
         Relations r1 = new Relations(relation,fd);
-        List<String> arr =r1.candidate_key(relation,fd);
-        System.out.println("The candidate keys of the relation are: ");
-        for(String s: arr) {System.out.println(s);}
+        arr =r1.candidate_key(relation,fd);
+//        System.out.println("The candidate keys of the relation are: ");
+//        for(String s: arr) {System.out.println(s);}
+        Candidate_keys ck= new Candidate_keys();
+        ck.setVisible(true);
+        dispose();
+    }//GEN-LAST:event_jButton2ActionPerformed
 
-
-        //formatting input
-        ArrayList attr = new ArrayList();
-        StringTokenizer str = new StringTokenizer(relation, "{,}");
-        while (str.hasMoreTokens()){
-            attr.add(str.nextToken());      
-        } 
-        String[] attributes = new String[attr.size()];
-        for (int i=0; i<attr.size(); i++) {
-            attributes[i] = (String)attr.get(i);
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Start.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Start.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Start.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Start.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
 
-        StringTokenizer st1 = new StringTokenizer(fd, "{,}"); 
-        ArrayList left = new ArrayList();
-        ArrayList right = new ArrayList();
-        while (st1.hasMoreTokens()){
-          String st2 = st1.nextToken();
-          StringTokenizer st3 = new StringTokenizer(st2, "->");
-          left.add(st3.nextToken());
-          right.add(st3.nextToken());
-        } 
-
-        int num_fd = left.size();
-        String[] left_attr = new String[num_fd];
-        String[] right_attr = new String[num_fd];
-        for (int i=0; i<num_fd; i++) {
-            left_attr[i]=(String)left.get(i);
-            right_attr[i]=(String)right.get(i);
-        }
-
-        //computing super keys of the relation
-        String temp = "";
-        for (int i = 0; i < attr.size(); i++)
-        {
-            temp += attributes[i];
-            Combinations(attributes, attr.size(), i + 1, left_attr, right_attr);
-        }
-        
-        //for printing all super keys
-        // System.out.println("Super Key: ");
-        // for(String key : SuperKeys.super_key)
-        // {
-        //    System.out.println(key);
-        // }
-
-        //computing highest normal form
-        HighestNF nf = new HighestNF();
-        nf.highest_nf(attributes, attr.size(), left_attr, right_attr, arr);
-        int n = nf.hnf;
-        if (n==-1){
-            System.out.println("Highest normal form: BCNF");
-        }
-        else
-        System.out.println("Highest normal form: " + n);
-        
-        if(n==1){
-            r1.nf2_normalisation(r1,arr.get(0));
-        }
-        else if(n==2){
-            r1.nf3_normalisation(r1,arr.get(0));
-        }
-        //else if(n==3){
-            System.out.println("The decomposed bcnf relations are: ");
-            r1.convert_to_bcnf(r1);
-        //}
-
-       
-        // r1.nf2_normalisation(r1, arr.get(0));
-        // r1.nf3_normalisation(r1, arr.get(0));
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new Start().setVisible(true);
+            }
+        });
     }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
+    // End of variables declaration//GEN-END:variables
 }
-
-/*Test Cases for nf3_normalisation:
-1. R: {A,B,C,D,E,F,G}
-   FD: {A->CDE,B->FG,AB->CDEFG} 
-2. R: {P,L,C,A}
-   FD: {P->LCA,LC->AP,A->C}
-*/
-
-/*Test Cases for nf2_normalisation
-1. R: {A,B,C,D,E,F}
-   FD: {A->B,C->D,AC->EF}
-2. R: {A,B,C,D,E,F}
-   FD: {AB->C,A->D,B->EF}
-*/

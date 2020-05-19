@@ -1,5 +1,10 @@
 .DS_Store
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+/Module1/nbproject/private/
+=======
+>>>>>>> 2d244d5c2f6c8a6ac570109acc1697d48e22d92b
 a.out
 Bucket.class
 CandidateKey.class
@@ -21,6 +26,10 @@ SuperKeys.class
 temp.class
 temp.java
 
+<<<<<<< HEAD
 =======
 /Module1/nbproject/private/
 >>>>>>> f4ce83e62b15943cdc132451369db30de426a48c
+=======
+>>>>>>> f5305bbe5384ebd87aba3e99f3fcf0ffaa9ee46a
+>>>>>>> 2d244d5c2f6c8a6ac570109acc1697d48e22d92b
