@@ -1,2 +1,26 @@
 .DS_Store
+<<<<<<< HEAD
 /Module1/nbproject/private/
+=======
+a.out
+Bucket.class
+CandidateKey.class
+DBS.class
+Demo.class
+HighestNF.class
+java.util.*
+java.util.Dictionary
+java.util.Map
+MemoryExceededException.class
+NormalForms.class
+Relations.class
+save.java
+saveDBS.java
+saveDBS.class
+saveDBS1.java
+saveDemo.java
+SuperKeys.class
+temp.class
+temp.java
+
+>>>>>>> f5305bbe5384ebd87aba3e99f3fcf0ffaa9ee46a
