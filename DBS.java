@@ -371,13 +371,13 @@ class Relations{
             fd_set0.remove(new String(s1));
         }
 
-        for(String s: fd_set0){ 
-            //System.out.println(s);                                  //removing redundant fd 
-            char[] sch = s.toCharArray();
-            if((sch[0]==s.charAt(s.length()-1))&&(s.charAt(1)=='-')){
-                fd_set0.remove(s);
-            }
-        }
+        // for(String s: fd_set0){ 
+        //     //System.out.println(s);                                  //removing redundant fd 
+        //     char[] sch = s.toCharArray();
+        //     if((sch[0]==s.charAt(s.length()-1))&&(s.charAt(1)=='-')){
+        //         fd_set0.remove(s);
+        //     }
+        // }
         List<String> fd_set = loop_transitive_fd(fd_set0);
         return fd_set;
     }
@@ -971,7 +971,9 @@ class Relations{
                 for(Character a: alpha){
                     System.out.print(a);
                 }System.out.println();
-                
+                if (union.size()==1){
+                    return;
+                }
                 Set<Character> difference = new HashSet<Character>(beta); 
                 difference.removeAll(alpha); 
                 Set<Character> difference1 = new HashSet<Character>(r_set); 
