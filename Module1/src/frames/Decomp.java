@@ -74,7 +74,7 @@ public class Decomp extends javax.swing.JFrame {
                 Vector<Object> data = new Vector<Object>();
                 String pr = dt.get(i); 
                 System.out.println("ok "+ pr);
-                StringTokenizer str = new StringTokenizer(pr, " The key of this relation is: ");
+                StringTokenizer str = new StringTokenizer(pr, "The key of this relation is: ");
                 while (str.hasMoreTokens()){
                     data.add(str.nextToken());      
                 } 
@@ -163,6 +163,7 @@ public class Decomp extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
 //        JOptionPane.showMessageDialog(null,"OK");
+        Relations.supplierNames3.clear();
         Start sp = new Start();
         sp.setVisible(true);
         dispose();
