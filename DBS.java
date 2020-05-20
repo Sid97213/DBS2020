@@ -78,7 +78,10 @@ class SuperKeys
 
 class HighestNF
 {
-    static int hnf = 1;
+    static int bcnf = 1;
+    static int nf3 = 1;
+    static int nf2 = 1;
+    static int nf1 = 1;
 
     static boolean anagrams(String lhs, String key) 
     { 
@@ -159,21 +162,18 @@ class HighestNF
             }if (pd == 1) break;
 
         }
-        if (pd== 1)
+        if (pd == 1)
         {
-            hnf=1;
-            return;
+            nf2=0;
+//            return;
         }
-        hnf=2;
+//        hnf=2;
 
         //check for 3nf
         // for X->Y, either X is a super key or Y is a prime attribute
-        // int check=1;
-        hnf=3;
         for (int i=0; i<right.length; i++) {
             String lhs = left[i];
             int flag1=0;
-
             for(String key : SuperKeys.super_key)
             {
                 if (anagrams(lhs, key))
@@ -195,16 +195,12 @@ class HighestNF
             }
             if (flag2 == 1)                         //second condition false
             {
-                hnf = 2;
-                // check=0;
+                nf3 = 0;
                 break;
                 // return;
             }
         }
-        // if (check ==1){
-        //     hnf=3;
-        // }
-        
+//        hnf=3;
 
         //check for bcnf
         // for every X->Y, X should be a super key
@@ -222,16 +218,15 @@ class HighestNF
             }
             if (flag1 == 0)
             {
-                hnf = 3;
+                bcnf = 0;
                 // break;
                 return;
             }
         }
-        hnf = -1;
-        return;
+//        hnf = -1;
+//        return;
     }
 }
-
 
 class Relations{
     String relation; String fd;
@@ -556,21 +551,26 @@ class Relations{
     public static boolean equivalence(List <String>fd_set1, List <String> fd_set2, Relations r){
         boolean res=false;
         int flag=1;
+        String a="";
         for(int i=1; i<r.relation.length(); i=i+2){
-            HashMap<Character, Integer> map = new HashMap<>();      
-            for(int j=1; j<r.relation.length(); j=j+2){
-                if(j==i){   
-                    map.put(r.relation.charAt(j),1);
-                }
-                else{
-                    map.put(r.relation.charAt(j), 0);
+            a=a+r.relation.charAt(i);
+        }
+        List<Character> attrs= new ArrayList<>();
+        for(int i=0; i< (1<<a.length()); i++){                             //{A,B,C,D,E,F,G,H,I,J}
+            String sub1="";
+            for(int j=0; j<a.length(); j++){                               //{AB->C,AD->GH,BD->EF,A->I,H->J}
+                if((i & (1<<j))>0){
+                    sub1=sub1+a.charAt(j);
                 }
             }
-            if(!closure_for_3nf(map, fd_set1).equals(closure_for_3nf(map, fd_set2))){
-                flag=flag*0;
-            }   
-            else{
-                flag=flag*1;
+            if(sub1!=""){
+                attrs.clear();
+                for(int k=0; k<sub1.length(); k++){
+                    attrs.add(sub1.charAt(k));
+                }
+                if(!closure_calc(attrs, fd_set1).equals(closure_calc(attrs, fd_set2))){
+                    flag=0;
+                }
             }
         }
         if(flag==1){
@@ -579,121 +579,99 @@ class Relations{
         return res;
     }
 
-    public static List<String> minimal_cover(Relations r){
-        List<String> fd_ret= new ArrayList<>();
+public static List <String> minimal_cover(Relations r){
+        // System.out.println("Inside Minimal Cover");
+        List<Character> attrs= new ArrayList<>();
+        attrs.add('A');
         List<String> fd_set = new ArrayList<>();
-       
-        
+        List<String> f = new ArrayList<>();
+        // List <String>
         StringTokenizer st1 = new StringTokenizer(r.fd, ",{}"); 
         while (st1.hasMoreTokens()) {
             fd_set.add(st1.nextToken());
         }
-        fd_ret.addAll(fd_set); //1
-        Set<Character> r_set = new HashSet<Character>();
-        StringTokenizer st2 = new StringTokenizer(r.relation, ",{}"); 
-        while (st2.hasMoreTokens()) {
-            Character c = (st2.nextToken()).charAt(0);
-            r_set.add(c);
+        f.addAll(fd_set);
+        List<String>f_new=new ArrayList<>();
+        f_new.addAll(f);
+        for(String s: f){
+            // System.out.println("Inside Step 1 with:"+s);
+            if((s.length()-s.indexOf('>'))>2){
+                // System.out.println("Examining for:"+s);
+                String lhs="";
+                for(int i=0; i<s.indexOf('-'); i++){
+                    lhs=lhs+s.charAt(i);
+                }
+                for(String s1: f){
+                    if(!s1.equals(s) && !f_new.contains(s1)){
+                        f_new.add(s1);
+                    }
+                }
+                for(int i= s.indexOf('>')+1; i<s.length(); i++){
+                    String toAdd="";
+                    toAdd=lhs+"->"+s.charAt(i);
+                    f_new.remove(s);
+                    if(!f_new.contains(toAdd)){
+                        f_new.add(toAdd);
+                    }
+                }
+            }
         }
-
-        for(String s:fd_set){
-            List<String> fd_set1 = new ArrayList<>();
-            for(String s1:fd_set){
-                if(!s.equals(s1)){
-                    if(!fd_set1.contains(s1)){
-                        fd_set1.add(s1);
-                    }
+        List <String> f_newplus= new ArrayList<>();
+        f_newplus.addAll(f_new);
+        for(String s: f_new){
+            // System.out.println("Inside step 2");
+            if(s.indexOf('-')>1){
+                // System.out.println("Checking for:"+s);
+                String rhs="";
+                for(int i= s.indexOf('>')+1; i<s.length(); i++){
+                    rhs=rhs+s.charAt(i);
                 }
-            }
-            for (int i=0; (s.charAt(i)!='-'); i++){
-                String d="";
-                if((s.indexOf("-")==1)){
-                    for(int j=0; j<(s.length()); j++){
-                        d=d+s.charAt(j);
-                        
-                    }
-                }
-                else{                
-                    for(int j=0; j<(s.length()); j++){
-                        // if(s.indexOf("-")==1){
-                        //     d=d+s.charAt(0);
-                        // }
-                        if(s.charAt(i)!=s.charAt(j)){
-                            d=d+s.charAt(j);
+                for(int i=0; i<s.indexOf('-'); i++){
+                    String toAdd="";
+                    toAdd=s.charAt(i)+"->"+rhs;
+                    // System.out.println("Going with:"+toAdd);
+                    for(String s1: f_new){
+                        if(!s1.equals(s) && !f_new.contains(s1)){
+                            f_new.add(s1);
                         }
                     }
-                }
-                if(!fd_set1.contains(d)){
-                    fd_set1.add(d);      
-                }          
-                if(equivalence(fd_ret, fd_set1, r)){ //if(equivalence(fd_ret, fd_set1, r)){
-                   for(String s2: fd_set1){
-                        List<String> fd_set2 = new ArrayList<>();
-                        for (String s3: fd_set1){
-                            if(!s2.equals(s3)){
-                                if(!fd_set2.contains(s3)){
-                                    fd_set2.add(s3);
-                                }
-                            }
-                        }
-                        if(equivalence(fd_set1, fd_set2, r)){
-                            fd_ret.removeAll(fd_ret);
-                            fd_ret.addAll(fd_set2);
-                        }
-                        else{
-                            fd_ret.removeAll(fd_ret);
-                            fd_ret.addAll(fd_set1);
+                    if(!f_newplus.contains(toAdd)){
+                        f_newplus.remove(s);
+                        if(!f_newplus.contains(toAdd)){
+                            f_newplus.add(toAdd);
                         }
                     }
-                }
-
-                else{
-                    for(String s2: fd_set){
-                        List<String> fd_set2 = new ArrayList<>();
-                        for (String s3: fd_set){
-                            if(!s2.equals(s3)){
-                                if(!fd_set2.contains(s3)){
-                                    fd_set2.add(s3);
-                                }
-                            }
-                        }
-                        if(equivalence(fd_set, fd_set2, r)){
-                            // fd_ret= fd_set2;
-                            fd_ret.removeAll(fd_ret);
-                            fd_ret.addAll(fd_set2);
-                        }
-                        else{
-                            // fd_ret=fd_set;
-                            fd_ret.removeAll(fd_ret);
-                            fd_ret.addAll(fd_set);
+                    if(!equivalence(f_newplus, f_new, r)){
+                        f_newplus.remove(toAdd);
+                        if(!f_newplus.contains(s)){
+                            f_newplus.add(s);
                         }
                     }
                 }
             }
-
         }
-        //REMOVE THE FOLLOWING PART OF THIS FUNCTION IF CLOSURE WORKS PROPERLY
-        List<String> to_check= new ArrayList<>();
-        to_check.addAll(fd_ret);
-        for(String red: to_check){
-            List<String> fd_red= new ArrayList<>();
-            for(String red1:to_check){
-                if(!red1.equals(red)){
-                    fd_red.add(red1);
+        // System.out.println("f_newplus:"+ f_newplus);
+        List <String> f_ret= new ArrayList<>();
+        List <String> f_retplus= new ArrayList<>();
+        f_retplus.addAll(f_newplus);
+        for(String s: f_newplus){
+            // System.out.println("Inside step 3");
+            // System.out.println("Checking for:"+s);
+            f_ret.clear();
+            for(String s1: f_retplus){
+                if(!s1.equals(s)){
+                    f_ret.add(s1);
                 }
             }
-            if(equivalence(fd_red, fd_ret, r)){
-                fd_ret.removeAll(fd_ret);
-                fd_ret.addAll(fd_red);
+            if(equivalence(f_ret,f_retplus,r)){
+                // System.out.println(f_ret + "and"+f_retplus+"are equal, because:");
+                // System.out.println(closure_calc(attrs, f_ret)+ "and:");
+                // System.out.println(closure_calc(attrs, f_retplus)+ "and:");
+                f_retplus.clear();
+                f_retplus.addAll(f_ret);
             }
-            fd_red.removeAll(fd_red);
         }
-        // int rk=1;
-        // for(String debug: fd_ret){
-        //     System.out.println(debug+" "+rk);
-        //     rk++;
-        // }
-        return fd_ret;
+        return f_retplus;
     }
 
     public static boolean complete(Map<Character,Integer> map_new){
@@ -717,7 +695,8 @@ class Relations{
         return str;
     }
 
-    public static void nf2_normalisation(Relations r, String  key){ //requires the primary key to be passed as an argument for it to work properly
+    public static void nf2_normalisation(Relations r, String  key)
+    { //requires the primary key to be passed as an argument for it to work properly
         List<String> fd_set = new ArrayList<>();  
         List<String> rels= new ArrayList<>();                 
         StringTokenizer st1 = new StringTokenizer(r.fd, ",{}"); 
@@ -816,9 +795,11 @@ class Relations{
         }
     }
 
-    public static void nf3_normalisation(Relations r, String key){ //normalises the given relation to 3nf regardless of the nf it is in
-        List<String> fd_set = new ArrayList<>();                   //requires the primary key to be passed as an argument for it to work properly
-        List <String> rels= new ArrayList<>();                     // note that this function does not alter the original Relation schemas but rather just prints the decomposed schemas
+    public static void nf3_normalisation(Relations r, String key){ 
+
+       
+        List<String> fd_set = new ArrayList<>();                   
+        List <String> rels= new ArrayList<>();                     
         StringTokenizer st1 = new StringTokenizer(r.fd, ",{}"); 
         while (st1.hasMoreTokens()) {
             fd_set.add(st1.nextToken());
@@ -831,6 +812,7 @@ class Relations{
         }
         List<String> fd_new= new ArrayList<>();
         fd_new.addAll(minimal_cover(r));
+        // System.out.println("Minimal Cover:" + fd_new);
         String s1="";
         for (String str: fd_new){
             String schema1="";
@@ -839,9 +821,10 @@ class Relations{
             // System.out.println("Now considering the relations:" + str);
             for (int i=0; i<str.indexOf("-") ;i++){
                 s1=s1+str.charAt(i);
-                schema1=schema1+s1;
+                // schema1=schema1+s1;
                 // System.out.println("Schema now:"+ schema1);
             }
+            schema1=schema1+s1;
             // System.out.println("S1:"+ s1);
             int flag_var=0;
             for(String str1: fd_new){
@@ -849,7 +832,7 @@ class Relations{
                     // System.out.println("matched in "+ str1);
                     flag_var=1;
                     for(int k=str1.lastIndexOf(s1)+3; k<str1.length(); k++){
-                        if(schema1.lastIndexOf(str1.charAt(k))==-1){
+                        if(schema1.lastIndexOf(str1.charAt(k))==-1 && str1.charAt(k)!='>'){
                             schema1=schema1+str1.charAt(k);
                         }
                     }
@@ -924,6 +907,8 @@ class Relations{
             // System.out.println(l);
         }
     }
+
+
 
     public static void convert_to_bcnf(Relations r){
         List<String> fd_set5 = new ArrayList<>();
@@ -1162,12 +1147,20 @@ class DBS{
         //computing highest normal form
         HighestNF nf = new HighestNF();
         nf.highest_nf(attributes, attr.size(), left_attr, right_attr, arr);
-        int n = nf.hnf;
-        if (n==-1){
-            System.out.println("Highest normal form: BCNF");
+        int n=0;
+        if ((nf.nf2==1)&&(nf.nf3==0)&&(nf.bcnf==0)){
+            n=2;
         }
-        else
-        System.out.println("Highest normal form: " + n);
+        else if ((nf.nf2==1)&&(nf.nf3==1)&&(nf.bcnf==0)){
+            n=3;
+        }
+        else if ((nf.nf2==1)&&(nf.nf3==1)&&(nf.bcnf==1)){
+            n=-1;
+        }
+        else if ((nf.nf2==0)&&(nf.nf3==0)&&(nf.bcnf==0)){
+            n=1;
+        }
+        System.out.println("Highest nf- "+ n);
         
         if(n==1){
             r1.nf2_normalisation(r1,arr.get(0));
