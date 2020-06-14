@@ -1,4 +1,4 @@
-# DBS2020
+# Database Normalization and Extendible Hashing
 
 Module 1 is a Java based program that given a relation and its functional dependencies,computes all candidate keys, super keys, highest normal form and decomposes to its successive normal form (upto BCNF).
 
